@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# Taekwondo Community
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+태권도 커뮤니티 게시판 UI를 연습용으로 구현한 React 프로젝트입니다.
+현재는 로컬 state 기반으로 게시글 목록, 게시판 필터, 글 등록/삭제 기능을 다루고 있습니다.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- TypeScript
+- Vite
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 게시글 목록 조회
+- 게시판별 게시글 필터링
+- 게시글 등록
+- 게시글 삭제
+- `BoardFilter`, `PostList`, `PostForm` 컴포넌트 분리
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `src/App.tsx`: 전체 상태 관리와 컴포넌트 조합
+- `src/components/BoardFilter.tsx`: 게시판 필터 버튼
+- `src/components/PostList.tsx`: 게시글 목록 렌더링
+- `src/components/PostForm.tsx`: 게시글 등록 폼
+- `src/types/board.ts`: 게시판/게시글 공통 타입
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Current Limitations
+
+- 데이터는 서버나 DB가 아닌 로컬 state로만 관리됩니다.
+- 게시글 수정 기능은 아직 없습니다.
+- 인증, 권한, 댓글 기능은 구현되어 있지 않습니다.
+- 스타일링은 계속 정리 중인 단계입니다.
+
+## Next Steps
+
+- 게시글 수정 기능 추가
+- 로컬 저장소 또는 API 연동
+- 게시판 이름 표시 방식 개선
+- UI 스타일 정리
