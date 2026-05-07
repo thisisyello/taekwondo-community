@@ -1,4 +1,5 @@
 import type { Post } from "../types/board";
+import PostItem from "./PostItem";
 
 type PostListProps = {
     posts: Post[];
@@ -13,13 +14,11 @@ export default function PostList({ posts, onDeletePost }: PostListProps) {
     return (
         <ul>
             {posts.map((post) => (
-                <li key={post.id}>
-                    <h3>{post.title}</h3>
-                    <p>
-                        작성자: {post.author} | 게시판: {post.board}
-                    </p>
-                    <button onClick={() => onDeletePost(post.id)}>삭제</button>
-                </li>
+                <PostItem
+                    key={post.id}
+                    post={post}
+                    onDeletePost={onDeletePost}
+                />
             ))}
         </ul>
     );
