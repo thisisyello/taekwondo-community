@@ -16,6 +16,10 @@ export default function PostDetailPage({
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleDelete = () => {
+        const confirmed = window.confirm("게시글을 삭제하시겠습니까?");
+
+        if (!confirmed) return;
+
         onDeletePost(post.id);
         navigate("/");
     };
