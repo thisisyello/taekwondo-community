@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import PostForm from "../components/PostForm";
 import type { BoardType, Post } from "../types/board";
 
+type PostFormState = Omit<Post, "id">;
+
 type PostEditorPageProps =
     | {
           mode: "create";
@@ -19,20 +21,29 @@ export default function PostEditorPage(props: PostEditorPageProps) {
     const { mode, onSubmitPost } = props;
     const post = mode === "edit" ? props.post : null;
 
-    const [title, setTitle] = useState(post?.title ?? "");
-    const [content, setContent] = useState(post?.content ?? "");
-    const [author, setAuthor] = useState(post?.author ?? "");
-    const [board, setBoard] = useState<BoardType>(post?.board ?? "free");
+    const [form, setForm] = useState<PostFormState>({
+        title: post?.title ?? "",
+        content: post?.content ?? "",
+        author: post?.author ?? "",
+        board: post?.board ?? "free",
+    });
+
+    const updateForm = <Field extends keyof PostFormState>(
+        field: Field,
+        value: PostFormState[Field],
+    ) => {
+        setForm((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
 
     const handleSubmit = () => {
-        if (!title.trim() || !content.trim() || !author.trim()) return;
+        if (!form.title.trim() || !form.content.trim() || !form.author.trim()) {
+            return;
+        }
 
-        onSubmitPost({
-            title,
-            content,
-            author,
-            board,
-        });
+        onSubmitPost(form);
 
         if (mode === "edit") {
             navigate(`/posts/${props.post.id}`);
@@ -48,14 +59,14 @@ export default function PostEditorPage(props: PostEditorPageProps) {
 
             <PostForm
                 mode={mode}
-                title={title}
-                content={content}
-                author={author}
-                board={board}
-                onChangeTitle={setTitle}
-                onChangeContent={setContent}
-                onChangeAuthor={setAuthor}
-                onChangeBoard={setBoard}
+                title={form.title}
+                content={form.content}
+                author={form.author}
+                board={form.board}
+                onChangeTitle={(value) => updateForm("title", value)}
+                onChangeContent={(value) => updateForm("content", value)}
+                onChangeAuthor={(value) => updateForm("author", value)}
+                onChangeBoard={(value: BoardType) => updateForm("board", value)}
                 onSubmit={handleSubmit}
                 onCancel={() => navigate(-1)}
             />
