@@ -1,36 +1,47 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import PostForm from "../components/PostForm";
-import type { BoardType, Post } from "../types/board";
-
-type PostFormState = Omit<Post, "id">;
+import type { BoardType, Post, PostFormData } from "../types/board";
 
 type PostEditorPageProps =
     | {
           mode: "create";
-          onSubmitPost: (post: Omit<Post, "id">) => Post;
+          onSubmitPost: (post: PostFormData) => Post;
       }
     | {
           mode: "edit";
           post: Post;
-          onSubmitPost: (post: Omit<Post, "id">) => void;
+          onSubmitPost: (post: PostFormData) => void;
       };
+
+const getInitialForm = (props: PostEditorPageProps): PostFormData => {
+    if (props.mode === "edit") {
+        return {
+            title: props.post.title,
+            content: props.post.content,
+            author: props.post.author,
+            board: props.post.board,
+        };
+    }
+
+    return {
+        title: "",
+        content: "",
+        author: "",
+        board: "free",
+    };
+};
 
 export default function PostEditorPage(props: PostEditorPageProps) {
     const navigate = useNavigate();
     const { mode, onSubmitPost } = props;
-    const post = mode === "edit" ? props.post : null;
+    const [form, setForm] = useState<PostFormData>(() =>
+        getInitialForm(props),
+    );
 
-    const [form, setForm] = useState<PostFormState>({
-        title: post?.title ?? "",
-        content: post?.content ?? "",
-        author: post?.author ?? "",
-        board: post?.board ?? "free",
-    });
-
-    const updateForm = <Field extends keyof PostFormState>(
+    const updateForm = <Field extends keyof PostFormData>(
         field: Field,
-        value: PostFormState[Field],
+        value: PostFormData[Field],
     ) => {
         setForm((prev) => ({
             ...prev,

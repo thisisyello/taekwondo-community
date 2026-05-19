@@ -9,3 +9,5 @@ export type Post = {
     author: string;
     board: BoardType;
 };
+
+export type PostFormData = Omit<Post, "id">;

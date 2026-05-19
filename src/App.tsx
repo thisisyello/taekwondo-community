@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useParams } from "react-router";
 import BoardPage from "./pages/BoardPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
-import type { BoardFilterType, Post } from "./types/board";
+import type { BoardFilterType, Post, PostFormData } from "./types/board";
 
 export default function App() {
     const [posts, setPosts] = useState<Post[]>([
@@ -38,7 +38,7 @@ export default function App() {
             ? posts
             : posts.filter((post) => post.board === selectedBoardType);
 
-    const handleCreatePost = (post: Omit<Post, "id">) => {
+    const handleCreatePost = (post: PostFormData) => {
         const newPost: Post = {
             id: Date.now(),
             ...post,
@@ -49,7 +49,7 @@ export default function App() {
         return newPost;
     };
 
-    const handleUpdatePost = (id: number, updatedPost: Omit<Post, "id">) => {
+    const handleUpdatePost = (id: number, updatedPost: PostFormData) => {
         setPosts((prev) =>
             prev.map((post) =>
                 post.id === id ? { ...post, ...updatedPost } : post,
@@ -125,7 +125,7 @@ function PostDetailRoute({ posts, onDeletePost }: PostDetailRouteProps) {
 }
 
 type PostEditRouteProps = PostRouteProps & {
-    onUpdatePost: (id: number, post: Omit<Post, "id">) => void;
+    onUpdatePost: (id: number, post: PostFormData) => void;
 };
 
 function PostEditRoute({ posts, onUpdatePost }: PostEditRouteProps) {
@@ -138,6 +138,7 @@ function PostEditRoute({ posts, onUpdatePost }: PostEditRouteProps) {
 
     return (
         <PostEditorPage
+            key={post.id}
             mode="edit"
             post={post}
             onSubmitPost={(updatedPost) => onUpdatePost(post.id, updatedPost)}
