@@ -28,8 +28,13 @@ export default function PostForm({
   onSubmit,
   onCancel,
 }: PostFormProps) {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onSubmit();
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <input
         placeholder="제목"
         value={title}
@@ -59,10 +64,12 @@ export default function PostForm({
         ))}
       </select>
 
-      <button onClick={onSubmit}>
+      <button type="submit">
         {mode === "create" ? "글 등록" : "수정 완료"}
       </button>
-      <button onClick={onCancel}>취소</button>
-    </div>
+      <button type="button" onClick={onCancel}>
+        취소
+      </button>
+    </form>
   );
 }
