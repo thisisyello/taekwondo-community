@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { BOARD_LABELS } from "../types/board";
 import type { Post } from "../types/board";
 
 type PostDetailPageProps = {
@@ -35,7 +36,7 @@ export default function PostDetailPage({
 
             <h1>{post.title}</h1>
             <p>
-                작성자: {post.author} | 게시판: {post.board}
+                작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]}
             </p>
             <p>{post.content}</p>
         </section>

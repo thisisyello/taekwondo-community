@@ -1,3 +1,4 @@
+import { BOARD_OPTIONS } from "../types/board";
 import type { BoardType } from "../types/board";
 
 type PostFormProps = {
@@ -51,11 +52,11 @@ export default function PostForm({
         value={board}
         onChange={(e) => onChangeBoard(e.target.value as BoardType)}
       >
-        <option value="free">자유</option>
-        <option value="parent">학부모</option>
-        <option value="coach">지도진</option>
-        <option value="student">관원생</option>
-        <option value="question">질문</option>
+        {BOARD_OPTIONS.map((option) => (
+          <option key={option.type} value={option.type}>
+            {option.label}
+          </option>
+        ))}
       </select>
 
       <button onClick={onSubmit}>

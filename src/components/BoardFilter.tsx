@@ -1,3 +1,4 @@
+import { BOARD_OPTIONS } from "../types/board";
 import type { BoardFilterType } from "../types/board";
 
 type BoardFilterProps = {
@@ -5,18 +6,9 @@ type BoardFilterProps = {
     onSelectBoardType: (boardType: BoardFilterType) => void;
 };
 
-type BoardOption = {
-    type: BoardFilterType;
-    label: string;
-};
-
-const boardOptions: BoardOption[] = [
+const boardFilterOptions: Array<{ type: BoardFilterType; label: string }> = [
     { type: "all", label: "전체" },
-    { type: "free", label: "자유게시판" },
-    { type: "parent", label: "학부모게시판" },
-    { type: "coach", label: "지도진게시판" },
-    { type: "student", label: "관원생게시판" },
-    { type: "question", label: "질문게시판" },
+    ...BOARD_OPTIONS,
 ];
 
 export default function BoardFilter({
@@ -25,7 +17,7 @@ export default function BoardFilter({
 }: BoardFilterProps) {
     return (
         <div>
-            {boardOptions.map((option) => (
+            {boardFilterOptions.map((option) => (
                 <button
                     key={option.type}
                     onClick={() => onSelectBoardType(option.type)}
