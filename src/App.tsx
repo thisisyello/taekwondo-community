@@ -68,7 +68,6 @@ export default function App() {
                         posts={filteredPosts}
                         selectedBoardType={selectedBoardType}
                         onSelectBoardType={setSelectedBoardType}
-                        onDeletePost={handleDeletePost}
                     />
                 }
             />
@@ -83,7 +82,12 @@ export default function App() {
             />
             <Route
                 path="/posts/:postId"
-                element={<PostDetailRoute posts={posts} />}
+                element={
+                    <PostDetailRoute
+                        posts={posts}
+                        onDeletePost={handleDeletePost}
+                    />
+                }
             />
             <Route
                 path="/posts/:postId/edit"
@@ -103,7 +107,11 @@ type PostRouteProps = {
     posts: Post[];
 };
 
-function PostDetailRoute({ posts }: PostRouteProps) {
+type PostDetailRouteProps = PostRouteProps & {
+    onDeletePost: (id: number) => void;
+};
+
+function PostDetailRoute({ posts, onDeletePost }: PostDetailRouteProps) {
     const { postId } = useParams();
     const post = posts.find((item) => item.id === Number(postId));
 
@@ -111,7 +119,7 @@ function PostDetailRoute({ posts }: PostRouteProps) {
         return <Navigate to="/" replace />;
     }
 
-    return <PostDetailPage post={post} />;
+    return <PostDetailPage post={post} onDeletePost={onDeletePost} />;
 }
 
 type PostEditRouteProps = PostRouteProps & {

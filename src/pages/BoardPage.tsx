@@ -7,14 +7,12 @@ type BoardPageProps = {
     posts: Post[];
     selectedBoardType: BoardFilterType;
     onSelectBoardType: (boardType: BoardFilterType) => void;
-    onDeletePost: (id: number) => void;
 };
 
 export default function BoardPage({
     posts,
     selectedBoardType,
     onSelectBoardType,
-    onDeletePost,
 }: BoardPageProps) {
     return (
         <section>
@@ -25,7 +23,7 @@ export default function BoardPage({
                 onSelectBoardType={onSelectBoardType}
             />
 
-            <PostList posts={posts} onDeletePost={onDeletePost} />
+            <PostList posts={posts} />
 
             <Link to="/posts/new">글쓰기</Link>
         </section>

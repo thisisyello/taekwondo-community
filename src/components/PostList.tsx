@@ -3,10 +3,9 @@ import PostItem from "./PostItem";
 
 type PostListProps = {
     posts: Post[];
-    onDeletePost: (id: number) => void;
 };
 
-export default function PostList({ posts, onDeletePost }: PostListProps) {
+export default function PostList({ posts }: PostListProps) {
     if (posts.length === 0) {
         return <p>게시글이 없습니다.</p>;
     }
@@ -14,11 +13,7 @@ export default function PostList({ posts, onDeletePost }: PostListProps) {
     return (
         <ul>
             {posts.map((post) => (
-                <PostItem
-                    key={post.id}
-                    post={post}
-                    onDeletePost={onDeletePost}
-                />
+                <PostItem key={post.id} post={post} />
             ))}
         </ul>
     );
