@@ -45,6 +45,8 @@ export default function App() {
         };
 
         setPosts((prev) => [...prev, newPost]);
+
+        return newPost;
     };
 
     const handleUpdatePost = (id: number, updatedPost: Omit<Post, "id">) => {

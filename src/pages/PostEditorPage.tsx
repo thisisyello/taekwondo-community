@@ -8,7 +8,7 @@ type PostFormState = Omit<Post, "id">;
 type PostEditorPageProps =
     | {
           mode: "create";
-          onSubmitPost: (post: Omit<Post, "id">) => void;
+          onSubmitPost: (post: Omit<Post, "id">) => Post;
       }
     | {
           mode: "edit";
@@ -43,14 +43,14 @@ export default function PostEditorPage(props: PostEditorPageProps) {
             return;
         }
 
-        onSubmitPost(form);
-
         if (mode === "edit") {
+            onSubmitPost(form);
             navigate(`/posts/${props.post.id}`);
             return;
         }
 
-        navigate("/");
+        const newPost = onSubmitPost(form);
+        navigate(`/posts/${newPost.id}`);
     };
 
     return (
