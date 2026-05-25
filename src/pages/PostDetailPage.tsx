@@ -1,15 +1,25 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import CommentForm from "../components/CommentForm";
+import CommentList from "../components/CommentList";
 import { BOARD_LABELS } from "../types/board";
-import type { Post } from "../types/board";
+import type { Comment, CommentFormData, Post } from "../types/board";
 
 type PostDetailPageProps = {
     post: Post;
+    comments: Comment[];
+    onAddComment: (postId: number, comment: CommentFormData) => void;
+    onUpdateComment: (id: number, content: string) => void;
+    onDeleteComment: (id: number) => void;
     onDeletePost: (id: number) => void;
 };
 
 export default function PostDetailPage({
     post,
+    comments,
+    onAddComment,
+    onUpdateComment,
+    onDeleteComment,
     onDeletePost,
 }: PostDetailPageProps) {
     const navigate = useNavigate();
@@ -43,6 +53,18 @@ export default function PostDetailPage({
                 작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]}
             </p>
             <p>{post.content}</p>
+
+            <section>
+                <h2>댓글</h2>
+                <CommentList
+                    comments={comments}
+                    onUpdateComment={onUpdateComment}
+                    onDeleteComment={onDeleteComment}
+                />
+                <CommentForm
+                    onAddComment={(comment) => onAddComment(post.id, comment)}
+                />
+            </section>
         </section>
     );
 }

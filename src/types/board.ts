@@ -42,3 +42,12 @@ export type Post = {
 };
 
 export type PostFormData = Omit<Post, "id">;
+
+export type Comment = {
+    id: number;
+    postId: number;
+    content: string;
+    author: string;
+};
+
+export type CommentFormData = Omit<Comment, "id" | "postId">;

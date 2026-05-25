@@ -3,7 +3,13 @@ import { Navigate, Route, Routes, useParams } from "react-router";
 import BoardPage from "./pages/BoardPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
-import type { BoardFilterType, Post, PostFormData } from "./types/board";
+import type {
+    BoardFilterType,
+    Comment,
+    CommentFormData,
+    Post,
+    PostFormData,
+} from "./types/board";
 
 export default function App() {
     const [posts, setPosts] = useState<Post[]>([
@@ -27,6 +33,20 @@ export default function App() {
             content: "이번 달 승급심사를 앞두고 기본 동작을 다시 점검하고 있습니다.",
             author: "관원생",
             board: "free",
+        },
+    ]);
+    const [comments, setComments] = useState<Comment[]>([
+        {
+            id: 1,
+            postId: 1,
+            content: "저희 아이는 와이어 줄넘기를 쓰고 있어요.",
+            author: "학부모2",
+        },
+        {
+            id: 2,
+            postId: 2,
+            content: "상담 전에 질문 목록을 적어가면 좋더라고요.",
+            author: "학부모3",
         },
     ]);
 
@@ -59,6 +79,29 @@ export default function App() {
 
     const handleDeletePost = (id: number) => {
         setPosts((prev) => prev.filter((post) => post.id !== id));
+        setComments((prev) => prev.filter((comment) => comment.postId !== id));
+    };
+
+    const handleAddComment = (postId: number, comment: CommentFormData) => {
+        const newComment: Comment = {
+            id: Date.now(),
+            postId,
+            ...comment,
+        };
+
+        setComments((prev) => [...prev, newComment]);
+    };
+
+    const handleUpdateComment = (id: number, content: string) => {
+        setComments((prev) =>
+            prev.map((comment) =>
+                comment.id === id ? { ...comment, content } : comment,
+            ),
+        );
+    };
+
+    const handleDeleteComment = (id: number) => {
+        setComments((prev) => prev.filter((comment) => comment.id !== id));
     };
 
     return (
@@ -87,6 +130,10 @@ export default function App() {
                 element={
                     <PostDetailRoute
                         posts={posts}
+                        comments={comments}
+                        onAddComment={handleAddComment}
+                        onUpdateComment={handleUpdateComment}
+                        onDeleteComment={handleDeleteComment}
                         onDeletePost={handleDeletePost}
                     />
                 }
@@ -110,10 +157,21 @@ type PostRouteProps = {
 };
 
 type PostDetailRouteProps = PostRouteProps & {
+    comments: Comment[];
+    onAddComment: (postId: number, comment: CommentFormData) => void;
+    onUpdateComment: (id: number, content: string) => void;
+    onDeleteComment: (id: number) => void;
     onDeletePost: (id: number) => void;
 };
 
-function PostDetailRoute({ posts, onDeletePost }: PostDetailRouteProps) {
+function PostDetailRoute({
+    posts,
+    comments,
+    onAddComment,
+    onUpdateComment,
+    onDeleteComment,
+    onDeletePost,
+}: PostDetailRouteProps) {
     const { postId } = useParams();
     const post = posts.find((item) => item.id === Number(postId));
 
@@ -121,7 +179,18 @@ function PostDetailRoute({ posts, onDeletePost }: PostDetailRouteProps) {
         return <Navigate to="/" replace />;
     }
 
-    return <PostDetailPage post={post} onDeletePost={onDeletePost} />;
+    const postComments = comments.filter((comment) => comment.postId === post.id);
+
+    return (
+        <PostDetailPage
+            post={post}
+            comments={postComments}
+            onAddComment={onAddComment}
+            onUpdateComment={onUpdateComment}
+            onDeleteComment={onDeleteComment}
+            onDeletePost={onDeletePost}
+        />
+    );
 }
 
 type PostEditRouteProps = PostRouteProps & {
