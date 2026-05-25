@@ -31,7 +31,14 @@ export default function CommentItem({
         setIsEditing(false);
     };
 
+    const handleStartEdit = () => {
+        setIsMenuOpen(false);
+        setIsEditing(true);
+    };
+
     const handleDelete = () => {
+        setIsMenuOpen(false);
+
         const confirmed = window.confirm("댓글을 삭제하시겠습니까?");
 
         if (!confirmed) return;
@@ -62,7 +69,7 @@ export default function CommentItem({
 
             {isMenuOpen && (
                 <div>
-                    <button onClick={() => setIsEditing(true)}>수정</button>
+                    <button onClick={handleStartEdit}>수정</button>
                     <button onClick={handleDelete}>삭제</button>
                 </div>
             )}

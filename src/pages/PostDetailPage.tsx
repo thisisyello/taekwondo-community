@@ -25,7 +25,13 @@ export default function PostDetailPage({
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const handleStartEdit = () => {
+        setIsMenuOpen(false);
+    };
+
     const handleDelete = () => {
+        setIsMenuOpen(false);
+
         const confirmed = window.confirm("게시글을 삭제하시겠습니까?");
 
         if (!confirmed) return;
@@ -43,7 +49,9 @@ export default function PostDetailPage({
 
             {isMenuOpen && (
                 <div>
-                    <Link to={`/posts/${post.id}/edit`}>수정</Link>
+                    <Link to={`/posts/${post.id}/edit`} onClick={handleStartEdit}>
+                        수정
+                    </Link>
                     <button onClick={handleDelete}>삭제</button>
                 </div>
             )}
