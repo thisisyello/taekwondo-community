@@ -16,7 +16,11 @@ export default function CommentItem({
     const [isEditing, setIsEditing] = useState(false);
     const [content, setContent] = useState(comment.content);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleToggleMenu = () => {
+        setIsMenuOpen((prev) => !prev);
+    };
+
+    const handleSubmitEdit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!content.trim()) return;
@@ -49,7 +53,7 @@ export default function CommentItem({
     return (
         <li>
             {isEditing ? (
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmitEdit}>
                     <textarea
                         value={content}
                         onChange={(event) => setContent(event.target.value)}
@@ -63,9 +67,7 @@ export default function CommentItem({
                 <p>{comment.content}</p>
             )}
             <p>작성자: {comment.author}</p>
-            <button onClick={() => setIsMenuOpen((prev) => !prev)}>
-                메뉴
-            </button>
+            <button onClick={handleToggleMenu}>메뉴</button>
 
             {isMenuOpen && (
                 <div>
