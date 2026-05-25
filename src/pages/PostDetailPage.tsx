@@ -4,6 +4,7 @@ import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
 import { BOARD_LABELS } from "../types/board";
 import type { Comment, CommentFormData, Post } from "../types/board";
+import { formatDate, isEdited } from "../utils/date";
 
 type PostDetailPageProps = {
     post: Post;
@@ -59,6 +60,10 @@ export default function PostDetailPage({
             <h1>{post.title}</h1>
             <p>
                 작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]}
+            </p>
+            <p>
+                작성일: {formatDate(post.createdAt)}
+                {isEdited(post.createdAt, post.updatedAt) && " (수정됨)"}
             </p>
             <p>{post.content}</p>
 

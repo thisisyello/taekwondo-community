@@ -39,15 +39,22 @@ export type Post = {
     content: string;
     author: string;
     board: BoardType;
+    createdAt: string;
+    updatedAt: string;
 };
 
-export type PostFormData = Omit<Post, "id">;
+export type PostFormData = Omit<Post, "id" | "createdAt" | "updatedAt">;
 
 export type Comment = {
     id: number;
     postId: number;
     content: string;
     author: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
-export type CommentFormData = Omit<Comment, "id" | "postId">;
+export type CommentFormData = Omit<
+    Comment,
+    "id" | "postId" | "createdAt" | "updatedAt"
+>;

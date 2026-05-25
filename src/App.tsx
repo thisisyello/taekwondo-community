@@ -25,9 +25,12 @@ export default function App() {
             : posts.filter((post) => post.board === selectedBoardType);
 
     const handleCreatePost = (post: PostFormData) => {
+        const now = new Date().toISOString();
         const newPost: Post = {
             id: Date.now(),
             ...post,
+            createdAt: now,
+            updatedAt: now,
         };
 
         setPosts((prev) => [...prev, newPost]);
@@ -38,7 +41,13 @@ export default function App() {
     const handleUpdatePost = (id: number, updatedPost: PostFormData) => {
         setPosts((prev) =>
             prev.map((post) =>
-                post.id === id ? { ...post, ...updatedPost } : post,
+                post.id === id
+                    ? {
+                          ...post,
+                          ...updatedPost,
+                          updatedAt: new Date().toISOString(),
+                      }
+                    : post,
             ),
         );
     };
@@ -49,10 +58,13 @@ export default function App() {
     };
 
     const handleAddComment = (postId: number, comment: CommentFormData) => {
+        const now = new Date().toISOString();
         const newComment: Comment = {
             id: Date.now(),
             postId,
             ...comment,
+            createdAt: now,
+            updatedAt: now,
         };
 
         setComments((prev) => [...prev, newComment]);
@@ -61,7 +73,13 @@ export default function App() {
     const handleUpdateComment = (id: number, content: string) => {
         setComments((prev) =>
             prev.map((comment) =>
-                comment.id === id ? { ...comment, content } : comment,
+                comment.id === id
+                    ? {
+                          ...comment,
+                          content,
+                          updatedAt: new Date().toISOString(),
+                      }
+                    : comment,
             ),
         );
     };

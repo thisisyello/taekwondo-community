@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Comment } from "../types/board";
+import { formatDate, isEdited } from "../utils/date";
 
 type CommentItemProps = {
     comment: Comment;
@@ -67,6 +68,10 @@ export default function CommentItem({
                 <p>{comment.content}</p>
             )}
             <p>작성자: {comment.author}</p>
+            <p>
+                작성일: {formatDate(comment.createdAt)}
+                {isEdited(comment.createdAt, comment.updatedAt) && " (수정됨)"}
+            </p>
             <button onClick={handleToggleMenu}>메뉴</button>
 
             {isMenuOpen && (
