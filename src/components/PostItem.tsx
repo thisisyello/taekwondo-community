@@ -8,6 +8,16 @@ type PostItemProps = {
     commentCount: number;
 };
 
+const PREVIEW_MAX_LENGTH = 60;
+
+const getPostPreview = (content: string) => {
+    if (content.length <= PREVIEW_MAX_LENGTH) {
+        return content;
+    }
+
+    return `${content.slice(0, PREVIEW_MAX_LENGTH)}...`;
+};
+
 export default function PostItem({ post, commentCount }: PostItemProps) {
     return (
         <li>
@@ -17,6 +27,7 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
                     {commentCount > 0 && ` [${commentCount}]`}
                 </Link>
             </h3>
+            <p>{getPostPreview(post.content)}</p>
             <p>
                 작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]} |
                 작성일: {formatDate(post.createdAt)}
