@@ -10,6 +10,7 @@ import type {
     CommentFormData,
     Post,
     PostFormData,
+    SearchTarget,
 } from "./types/board";
 
 export default function App() {
@@ -18,11 +19,32 @@ export default function App() {
 
     const [selectedBoardType, setSelectedBoardType] =
         useState<BoardFilterType>("all");
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
 
-    const filteredPosts =
+    const filteredByBoardPosts =
         selectedBoardType === "all"
             ? posts
             : posts.filter((post) => post.board === selectedBoardType);
+
+    const normalizedSearchKeyword = searchKeyword.trim().toLowerCase();
+    const filteredPosts =
+        normalizedSearchKeyword.length === 0
+            ? filteredByBoardPosts
+            : filteredByBoardPosts.filter((post) => {
+                  if (searchTarget === "all") {
+                      return [post.title, post.content, post.author].some(
+                          (value) =>
+                              value
+                                  .toLowerCase()
+                                  .includes(normalizedSearchKeyword),
+                      );
+                  }
+
+                  return post[searchTarget]
+                      .toLowerCase()
+                      .includes(normalizedSearchKeyword);
+              });
 
     const commentCountsByPostId = comments.reduce<Record<number, number>>(
         (counts, comment) => ({
@@ -104,6 +126,10 @@ export default function App() {
                     <BoardPage
                         posts={filteredPosts}
                         commentCountsByPostId={commentCountsByPostId}
+                        searchKeyword={searchKeyword}
+                        searchTarget={searchTarget}
+                        onChangeSearchKeyword={setSearchKeyword}
+                        onChangeSearchTarget={setSearchTarget}
                         selectedBoardType={selectedBoardType}
                         onSelectBoardType={setSelectedBoardType}
                     />

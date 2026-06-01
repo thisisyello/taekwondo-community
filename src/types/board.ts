@@ -2,6 +2,8 @@ export type BoardType = "free" | "parent" | "coach" | "student" | "question";
 
 export type BoardFilterType = BoardType | "all";
 
+export type SearchTarget = "all" | "title" | "content" | "author";
+
 export type BoardOption = {
     type: BoardType;
     label: string;
