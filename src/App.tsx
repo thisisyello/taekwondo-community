@@ -24,6 +24,14 @@ export default function App() {
             ? posts
             : posts.filter((post) => post.board === selectedBoardType);
 
+    const commentCountsByPostId = comments.reduce<Record<number, number>>(
+        (counts, comment) => ({
+            ...counts,
+            [comment.postId]: (counts[comment.postId] ?? 0) + 1,
+        }),
+        {},
+    );
+
     const handleCreatePost = (post: PostFormData) => {
         const now = new Date().toISOString();
         const newPost: Post = {
@@ -95,6 +103,7 @@ export default function App() {
                 element={
                     <BoardPage
                         posts={filteredPosts}
+                        commentCountsByPostId={commentCountsByPostId}
                         selectedBoardType={selectedBoardType}
                         onSelectBoardType={setSelectedBoardType}
                     />

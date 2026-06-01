@@ -5,12 +5,14 @@ import type { BoardFilterType, Post } from "../types/board";
 
 type BoardPageProps = {
     posts: Post[];
+    commentCountsByPostId: Record<number, number>;
     selectedBoardType: BoardFilterType;
     onSelectBoardType: (boardType: BoardFilterType) => void;
 };
 
 export default function BoardPage({
     posts,
+    commentCountsByPostId,
     selectedBoardType,
     onSelectBoardType,
 }: BoardPageProps) {
@@ -23,7 +25,10 @@ export default function BoardPage({
                 onSelectBoardType={onSelectBoardType}
             />
 
-            <PostList posts={posts} />
+            <PostList
+                posts={posts}
+                commentCountsByPostId={commentCountsByPostId}
+            />
 
             <Link to="/posts/new">글쓰기</Link>
         </section>
