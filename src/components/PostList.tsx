@@ -11,11 +11,15 @@ export default function PostList({
     commentCountsByPostId,
 }: PostListProps) {
     if (posts.length === 0) {
-        return <p>게시글이 없습니다.</p>;
+        return (
+            <p className="rounded-kta-lg border border-dashed border-kta-border bg-kta-surface px-5 py-10 text-center text-sm text-kta-muted">
+                게시글이 없습니다.
+            </p>
+        );
     }
 
     return (
-        <ul>
+        <ul className="flex flex-col gap-3">
             {posts.map((post) => (
                 <PostItem
                     key={post.id}

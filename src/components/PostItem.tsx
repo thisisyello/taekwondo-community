@@ -20,19 +20,39 @@ const getPostPreview = (content: string) => {
 
 export default function PostItem({ post, commentCount }: PostItemProps) {
     return (
-        <li>
-            <h3>
-                <Link to={`/posts/${post.id}`}>
-                    {post.title}
-                    {commentCount > 0 && ` [${commentCount}]`}
-                </Link>
-            </h3>
-            <p>{getPostPreview(post.content)}</p>
-            <p>
-                작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]} |
-                ❤️: {post.likeCount} | 작성일: {formatDate(post.createdAt)}
-                {isEdited(post.createdAt, post.updatedAt) && " (수정됨)"}
-            </p>
+        <li className="rounded-kta-lg border border-kta-border bg-kta-surface shadow-kta-sm transition hover:-translate-y-0.5 hover:shadow-kta-md">
+            <Link className="block px-5 py-4" to={`/posts/${post.id}`}>
+                <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                        <p className="text-xs font-bold text-kta-red">
+                            {BOARD_LABELS[post.board]}
+                        </p>
+                        <h3 className="mt-1 line-clamp-1 text-base font-extrabold text-kta-text">
+                            {post.title}
+                        </h3>
+                    </div>
+
+                    <div className="flex shrink-0 gap-1 text-xs font-bold">
+                        {commentCount > 0 && (
+                            <span className="rounded-full bg-red-50 px-2 py-1 text-kta-red">
+                                댓글 {commentCount}
+                            </span>
+                        )}
+                        <span className="rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
+                            공감 {post.likeCount}
+                        </span>
+                    </div>
+                </div>
+
+                <p className="mt-2 line-clamp-2 text-sm leading-6 text-kta-muted">
+                    {getPostPreview(post.content)}
+                </p>
+
+                <p className="mt-3 text-xs font-medium text-kta-muted">
+                    {post.author} · {formatDate(post.createdAt)}
+                    {isEdited(post.createdAt, post.updatedAt) && " (수정됨)"}
+                </p>
+            </Link>
         </li>
     );
 }
