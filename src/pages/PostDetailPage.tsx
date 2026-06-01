@@ -12,6 +12,7 @@ type PostDetailPageProps = {
     onAddComment: (postId: number, comment: CommentFormData) => void;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
+    onLikePost: (id: number) => void;
     onDeletePost: (id: number) => void;
 };
 
@@ -21,6 +22,7 @@ export default function PostDetailPage({
     onAddComment,
     onUpdateComment,
     onDeleteComment,
+    onLikePost,
     onDeletePost,
 }: PostDetailPageProps) {
     const navigate = useNavigate();
@@ -66,6 +68,9 @@ export default function PostDetailPage({
                 {isEdited(post.createdAt, post.updatedAt) && " (수정됨)"}
             </p>
             <p>{post.content}</p>
+            <button onClick={() => onLikePost(post.id)}>
+                공감 {post.likeCount}
+            </button>
 
             <section>
                 <h2>댓글</h2>

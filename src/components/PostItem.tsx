@@ -30,7 +30,7 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
             <p>{getPostPreview(post.content)}</p>
             <p>
                 작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]} |
-                작성일: {formatDate(post.createdAt)}
+                공감: {post.likeCount} | 작성일: {formatDate(post.createdAt)}
                 {isEdited(post.createdAt, post.updatedAt) && " (수정됨)"}
             </p>
         </li>

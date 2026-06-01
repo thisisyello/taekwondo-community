@@ -82,6 +82,7 @@ export default function App() {
         const newPost: Post = {
             id: Date.now(),
             ...post,
+            likeCount: 0,
             createdAt: now,
             updatedAt: now,
         };
@@ -108,6 +109,16 @@ export default function App() {
     const handleDeletePost = (id: number) => {
         setPosts((prev) => prev.filter((post) => post.id !== id));
         setComments((prev) => prev.filter((comment) => comment.postId !== id));
+    };
+
+    const handleLikePost = (id: number) => {
+        setPosts((prev) =>
+            prev.map((post) =>
+                post.id === id
+                    ? { ...post, likeCount: post.likeCount + 1 }
+                    : post,
+            ),
+        );
     };
 
     const handleAddComment = (postId: number, comment: CommentFormData) => {
@@ -178,6 +189,7 @@ export default function App() {
                         onAddComment={handleAddComment}
                         onUpdateComment={handleUpdateComment}
                         onDeleteComment={handleDeleteComment}
+                        onLikePost={handleLikePost}
                         onDeletePost={handleDeletePost}
                     />
                 }
@@ -205,6 +217,7 @@ type PostDetailRouteProps = PostRouteProps & {
     onAddComment: (postId: number, comment: CommentFormData) => void;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
+    onLikePost: (id: number) => void;
     onDeletePost: (id: number) => void;
 };
 
@@ -214,6 +227,7 @@ function PostDetailRoute({
     onAddComment,
     onUpdateComment,
     onDeleteComment,
+    onLikePost,
     onDeletePost,
 }: PostDetailRouteProps) {
     const { postId } = useParams();
@@ -232,6 +246,7 @@ function PostDetailRoute({
             onAddComment={onAddComment}
             onUpdateComment={onUpdateComment}
             onDeleteComment={onDeleteComment}
+            onLikePost={onLikePost}
             onDeletePost={onDeletePost}
         />
     );
