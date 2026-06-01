@@ -52,34 +52,67 @@ export default function CommentItem({
     };
 
     return (
-        <li>
+        <li className="py-4">
             {isEditing ? (
-                <form onSubmit={handleSubmitEdit}>
+                <form className="flex flex-col gap-2" onSubmit={handleSubmitEdit}>
                     <textarea
+                        className="min-h-24 rounded-kta-md border border-kta-border px-3 py-2 text-sm outline-none focus:border-kta-navy"
                         value={content}
                         onChange={(event) => setContent(event.target.value)}
                     />
-                    <button type="submit">수정 완료</button>
-                    <button type="button" onClick={handleCancelEdit}>
-                        취소
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            className="rounded-kta-md bg-kta-navy px-3 py-2 text-sm font-bold text-white"
+                            type="submit"
+                        >
+                            수정 완료
+                        </button>
+                        <button
+                            className="rounded-kta-md bg-kta-subtle px-3 py-2 text-sm font-bold text-kta-muted"
+                            type="button"
+                            onClick={handleCancelEdit}
+                        >
+                            취소
+                        </button>
+                    </div>
                 </form>
             ) : (
-                <p>{comment.content}</p>
+                <p className="text-sm leading-6 text-kta-text">
+                    {comment.content}
+                </p>
             )}
-            <p>작성자: {comment.author}</p>
-            <p>
-                작성일: {formatDate(comment.createdAt)}
-                {isEdited(comment.createdAt, comment.updatedAt) && " (수정됨)"}
-            </p>
-            <button onClick={handleToggleMenu}>메뉴</button>
+            <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="text-xs text-kta-muted">
+                    {comment.author} · {formatDate(comment.createdAt)}
+                    {isEdited(comment.createdAt, comment.updatedAt) &&
+                        " (수정됨)"}
+                </p>
+                <div className="relative">
+                    <button
+                        className="rounded-full bg-kta-subtle px-3 py-1 text-xs font-bold text-kta-muted"
+                        onClick={handleToggleMenu}
+                    >
+                        메뉴
+                    </button>
 
-            {isMenuOpen && (
-                <div>
-                    <button onClick={handleStartEdit}>수정</button>
-                    <button onClick={handleDelete}>삭제</button>
+                    {isMenuOpen && (
+                        <div className="absolute right-0 top-8 z-10 flex min-w-24 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
+                            <button
+                                className="px-3 py-2 text-left text-sm font-semibold text-kta-text hover:bg-kta-subtle"
+                                onClick={handleStartEdit}
+                            >
+                                수정
+                            </button>
+                            <button
+                                className="px-3 py-2 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
+                                onClick={handleDelete}
+                            >
+                                삭제
+                            </button>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </li>
     );
 }

@@ -97,7 +97,7 @@ export default function BoardPage({
                 />
 
                 <Link
-                    className="fixed bottom-5 right-5 rounded-full bg-kta-red px-5 py-3 text-sm font-bold text-white shadow-kta-md sm:static sm:self-end"
+                    className="fixed bottom-5 right-5 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md sm:static sm:self-end"
                     to="/posts/new"
                 >
                     글쓰기

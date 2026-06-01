@@ -34,26 +34,30 @@ export default function PostForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
       <input
+        className="h-12 rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy"
         placeholder="제목"
         value={title}
         onChange={(e) => onChangeTitle(e.target.value)}
       />
 
       <textarea
+        className="min-h-52 rounded-kta-md border border-kta-border px-3 py-3 text-sm leading-6 outline-none placeholder:text-kta-muted focus:border-kta-navy"
         placeholder="내용"
         value={content}
         onChange={(e) => onChangeContent(e.target.value)}
       />
 
       <input
+        className="h-12 rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy"
         placeholder="작성자"
         value={author}
         onChange={(e) => onChangeAuthor(e.target.value)}
       />
 
       <select
+        className="h-12 rounded-kta-md border border-kta-border bg-white px-3 text-sm outline-none focus:border-kta-navy"
         value={board}
         onChange={(e) => onChangeBoard(e.target.value as BoardType)}
       >
@@ -64,12 +68,21 @@ export default function PostForm({
         ))}
       </select>
 
-      <button type="submit">
-        {mode === "create" ? "글 등록" : "수정 완료"}
-      </button>
-      <button type="button" onClick={onCancel}>
-        취소
-      </button>
+      <div className="mt-2 flex gap-2">
+        <button
+          className="h-12 flex-1 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
+          type="submit"
+        >
+          {mode === "create" ? "글 등록" : "수정 완료"}
+        </button>
+        <button
+          className="h-12 flex-1 rounded-kta-md bg-kta-subtle text-sm font-bold text-kta-muted"
+          type="button"
+          onClick={onCancel}
+        >
+          취소
+        </button>
+      </div>
     </form>
   );
 }

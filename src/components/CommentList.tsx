@@ -13,11 +13,11 @@ export default function CommentList({
     onDeleteComment,
 }: CommentListProps) {
     if (comments.length === 0) {
-        return <p>댓글이 없습니다.</p>;
+        return <p className="text-sm text-kta-muted">댓글이 없습니다.</p>;
     }
 
     return (
-        <ul>
+        <ul className="flex flex-col divide-y divide-kta-border">
             {comments.map((comment) => (
                 <CommentItem
                     key={comment.id}

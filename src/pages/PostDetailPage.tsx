@@ -44,45 +44,81 @@ export default function PostDetailPage({
     };
 
     return (
-        <section>
-            <Link to="/">목록으로</Link>
-            <button onClick={() => setIsMenuOpen((prev) => !prev)}>
-                메뉴
-            </button>
-
-            {isMenuOpen && (
-                <div>
-                    <Link to={`/posts/${post.id}/edit`} onClick={handleStartEdit}>
-                        수정
+        <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
+            <div className="mx-auto flex max-w-3xl flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <Link className="text-sm font-bold text-kta-navy" to="/">
+                        목록으로
                     </Link>
-                    <button onClick={handleDelete}>삭제</button>
+                    <div className="relative">
+                        <button
+                            className="rounded-full bg-kta-surface px-4 py-2 text-sm font-bold text-kta-navy shadow-kta-sm"
+                            onClick={() => setIsMenuOpen((prev) => !prev)}
+                        >
+                            메뉴
+                        </button>
+
+                        {isMenuOpen && (
+                            <div className="absolute right-0 top-11 z-10 flex min-w-28 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
+                                <Link
+                                    className="px-4 py-3 text-sm font-semibold text-kta-text hover:bg-kta-subtle"
+                                    to={`/posts/${post.id}/edit`}
+                                    onClick={handleStartEdit}
+                                >
+                                    수정
+                                </Link>
+                                <button
+                                    className="px-4 py-3 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
+                                    onClick={handleDelete}
+                                >
+                                    삭제
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
 
-            <h1>{post.title}</h1>
-            <p>
-                작성자: {post.author} | 게시판: {BOARD_LABELS[post.board]}
-            </p>
-            <p>
-                작성일: {formatDate(post.createdAt)}
-                {isEdited(post.createdAt, post.updatedAt) && " (수정됨)"}
-            </p>
-            <p>{post.content}</p>
-            <button onClick={() => onLikePost(post.id)}>
-                ❤️ {post.likeCount}
-            </button>
+                <article className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
+                    <p className="text-xs font-bold text-kta-red">
+                        {BOARD_LABELS[post.board]}
+                    </p>
+                    <h1 className="mt-2 text-2xl font-black leading-tight text-kta-text">
+                        {post.title}
+                    </h1>
+                    <p className="mt-3 text-sm text-kta-muted">
+                        {post.author} · {formatDate(post.createdAt)}
+                        {isEdited(post.createdAt, post.updatedAt) &&
+                            " (수정됨)"}
+                    </p>
+                    <p className="mt-6 whitespace-pre-wrap text-base leading-8 text-kta-text">
+                        {post.content}
+                    </p>
+                    <button
+                        className="mt-6 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-kta-red"
+                        onClick={() => onLikePost(post.id)}
+                    >
+                        공감 {post.likeCount}
+                    </button>
+                </article>
 
-            <section>
-                <h2>댓글</h2>
-                <CommentList
-                    comments={comments}
-                    onUpdateComment={onUpdateComment}
-                    onDeleteComment={onDeleteComment}
-                />
-                <CommentForm
-                    onAddComment={(comment) => onAddComment(post.id, comment)}
-                />
-            </section>
+                <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
+                    <h2 className="text-lg font-black text-kta-navy">댓글</h2>
+                    <div className="mt-4">
+                        <CommentForm
+                            onAddComment={(comment) =>
+                                onAddComment(post.id, comment)
+                            }
+                        />
+                    </div>
+                    <div className="mt-5 border-t border-kta-border pt-5">
+                        <CommentList
+                            comments={comments}
+                            onUpdateComment={onUpdateComment}
+                            onDeleteComment={onDeleteComment}
+                        />
+                    </div>
+                </section>
+            </div>
         </section>
     );
 }
