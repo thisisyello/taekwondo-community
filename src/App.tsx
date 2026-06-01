@@ -4,6 +4,12 @@ import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
+import {
+    filterPostsByBoard,
+    filterPostsBySearch,
+    getCommentCountsByPostId,
+    sortPosts,
+} from "./utils/postList";
 import type {
     BoardFilterType,
     Comment,
@@ -24,58 +30,16 @@ export default function App() {
     const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
     const [postSortType, setPostSortType] = useState<PostSortType>("latest");
 
-    const filteredByBoardPosts =
-        selectedBoardType === "all"
-            ? posts
-            : posts.filter((post) => post.board === selectedBoardType);
-
-    const normalizedSearchKeyword = searchKeyword.trim().toLowerCase();
-    const filteredBySearchPosts =
-        normalizedSearchKeyword.length === 0
-            ? filteredByBoardPosts
-            : filteredByBoardPosts.filter((post) => {
-                  if (searchTarget === "all") {
-                      return [post.title, post.content, post.author].some(
-                          (value) =>
-                              value
-                                  .toLowerCase()
-                                  .includes(normalizedSearchKeyword),
-                      );
-                  }
-
-                  return post[searchTarget]
-                      .toLowerCase()
-                      .includes(normalizedSearchKeyword);
-              });
-
-    const commentCountsByPostId = comments.reduce<Record<number, number>>(
-        (counts, comment) => ({
-            ...counts,
-            [comment.postId]: (counts[comment.postId] ?? 0) + 1,
-        }),
-        {},
+    const commentCountsByPostId = getCommentCountsByPostId(comments);
+    const visiblePosts = sortPosts(
+        filterPostsBySearch(
+            filterPostsByBoard(posts, selectedBoardType),
+            searchTarget,
+            searchKeyword,
+        ),
+        postSortType,
+        commentCountsByPostId,
     );
-
-    const sortedPosts = [...filteredBySearchPosts].sort((firstPost, secondPost) => {
-        if (postSortType === "oldest") {
-            return (
-                new Date(firstPost.createdAt).getTime() -
-                new Date(secondPost.createdAt).getTime()
-            );
-        }
-
-        if (postSortType === "mostCommented") {
-            return (
-                (commentCountsByPostId[secondPost.id] ?? 0) -
-                (commentCountsByPostId[firstPost.id] ?? 0)
-            );
-        }
-
-        return (
-            new Date(secondPost.createdAt).getTime() -
-            new Date(firstPost.createdAt).getTime()
-        );
-    });
 
     const handleCreatePost = (post: PostFormData) => {
         const now = new Date().toISOString();
@@ -158,7 +122,7 @@ export default function App() {
                 path="/"
                 element={
                     <BoardPage
-                        posts={sortedPosts}
+                        posts={visiblePosts}
                         commentCountsByPostId={commentCountsByPostId}
                         searchKeyword={searchKeyword}
                         searchTarget={searchTarget}
