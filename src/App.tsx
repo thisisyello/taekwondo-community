@@ -4,9 +4,9 @@ import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
+import SearchPage from "./pages/SearchPage";
 import {
     filterPostsByBoard,
-    filterPostsBySearch,
     getCommentCountsByPostId,
     sortPosts,
 } from "./utils/postList";
@@ -17,7 +17,6 @@ import type {
     Post,
     PostFormData,
     PostSortType,
-    SearchTarget,
 } from "./types/board";
 
 export default function App() {
@@ -26,17 +25,11 @@ export default function App() {
 
     const [selectedBoardType, setSelectedBoardType] =
         useState<BoardFilterType>("all");
-    const [searchKeyword, setSearchKeyword] = useState("");
-    const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
     const [postSortType, setPostSortType] = useState<PostSortType>("latest");
 
     const commentCountsByPostId = getCommentCountsByPostId(comments);
     const visiblePosts = sortPosts(
-        filterPostsBySearch(
-            filterPostsByBoard(posts, selectedBoardType),
-            searchTarget,
-            searchKeyword,
-        ),
+        filterPostsByBoard(posts, selectedBoardType),
         postSortType,
         commentCountsByPostId,
     );
@@ -124,14 +117,19 @@ export default function App() {
                     <BoardPage
                         posts={visiblePosts}
                         commentCountsByPostId={commentCountsByPostId}
-                        searchKeyword={searchKeyword}
-                        searchTarget={searchTarget}
                         postSortType={postSortType}
-                        onChangeSearchKeyword={setSearchKeyword}
-                        onChangeSearchTarget={setSearchTarget}
                         onChangePostSortType={setPostSortType}
                         selectedBoardType={selectedBoardType}
                         onSelectBoardType={setSelectedBoardType}
+                    />
+                }
+            />
+            <Route
+                path="/search"
+                element={
+                    <SearchPage
+                        posts={posts}
+                        commentCountsByPostId={commentCountsByPostId}
                     />
                 }
             />
