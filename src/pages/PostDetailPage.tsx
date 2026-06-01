@@ -69,7 +69,7 @@ export default function PostDetailPage({
             </p>
             <p>{post.content}</p>
             <button onClick={() => onLikePost(post.id)}>
-                공감 {post.likeCount}
+                ❤️ {post.likeCount}
             </button>
 
             <section>
