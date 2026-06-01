@@ -4,6 +4,8 @@ export type BoardFilterType = BoardType | "all";
 
 export type SearchTarget = "all" | "title" | "content" | "author";
 
+export type PostSortType = "latest" | "oldest" | "mostCommented";
+
 export type BoardOption = {
     type: BoardType;
     label: string;

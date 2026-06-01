@@ -10,6 +10,7 @@ import type {
     CommentFormData,
     Post,
     PostFormData,
+    PostSortType,
     SearchTarget,
 } from "./types/board";
 
@@ -21,6 +22,7 @@ export default function App() {
         useState<BoardFilterType>("all");
     const [searchKeyword, setSearchKeyword] = useState("");
     const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
+    const [postSortType, setPostSortType] = useState<PostSortType>("latest");
 
     const filteredByBoardPosts =
         selectedBoardType === "all"
@@ -28,7 +30,7 @@ export default function App() {
             : posts.filter((post) => post.board === selectedBoardType);
 
     const normalizedSearchKeyword = searchKeyword.trim().toLowerCase();
-    const filteredPosts =
+    const filteredBySearchPosts =
         normalizedSearchKeyword.length === 0
             ? filteredByBoardPosts
             : filteredByBoardPosts.filter((post) => {
@@ -53,6 +55,27 @@ export default function App() {
         }),
         {},
     );
+
+    const sortedPosts = [...filteredBySearchPosts].sort((firstPost, secondPost) => {
+        if (postSortType === "oldest") {
+            return (
+                new Date(firstPost.createdAt).getTime() -
+                new Date(secondPost.createdAt).getTime()
+            );
+        }
+
+        if (postSortType === "mostCommented") {
+            return (
+                (commentCountsByPostId[secondPost.id] ?? 0) -
+                (commentCountsByPostId[firstPost.id] ?? 0)
+            );
+        }
+
+        return (
+            new Date(secondPost.createdAt).getTime() -
+            new Date(firstPost.createdAt).getTime()
+        );
+    });
 
     const handleCreatePost = (post: PostFormData) => {
         const now = new Date().toISOString();
@@ -124,12 +147,14 @@ export default function App() {
                 path="/"
                 element={
                     <BoardPage
-                        posts={filteredPosts}
+                        posts={sortedPosts}
                         commentCountsByPostId={commentCountsByPostId}
                         searchKeyword={searchKeyword}
                         searchTarget={searchTarget}
+                        postSortType={postSortType}
                         onChangeSearchKeyword={setSearchKeyword}
                         onChangeSearchTarget={setSearchTarget}
+                        onChangePostSortType={setPostSortType}
                         selectedBoardType={selectedBoardType}
                         onSelectBoardType={setSelectedBoardType}
                     />

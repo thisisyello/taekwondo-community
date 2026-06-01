@@ -1,15 +1,22 @@
 import { Link } from "react-router";
 import BoardFilter from "../components/BoardFilter";
 import PostList from "../components/PostList";
-import type { BoardFilterType, Post, SearchTarget } from "../types/board";
+import type {
+    BoardFilterType,
+    Post,
+    PostSortType,
+    SearchTarget,
+} from "../types/board";
 
 type BoardPageProps = {
     posts: Post[];
     commentCountsByPostId: Record<number, number>;
     searchKeyword: string;
     searchTarget: SearchTarget;
+    postSortType: PostSortType;
     onChangeSearchKeyword: (keyword: string) => void;
     onChangeSearchTarget: (target: SearchTarget) => void;
+    onChangePostSortType: (sortType: PostSortType) => void;
     selectedBoardType: BoardFilterType;
     onSelectBoardType: (boardType: BoardFilterType) => void;
 };
@@ -19,8 +26,10 @@ export default function BoardPage({
     commentCountsByPostId,
     searchKeyword,
     searchTarget,
+    postSortType,
     onChangeSearchKeyword,
     onChangeSearchTarget,
+    onChangePostSortType,
     selectedBoardType,
     onSelectBoardType,
 }: BoardPageProps) {
@@ -49,6 +58,17 @@ export default function BoardPage({
                 value={searchKeyword}
                 onChange={(event) => onChangeSearchKeyword(event.target.value)}
             />
+
+            <select
+                value={postSortType}
+                onChange={(event) =>
+                    onChangePostSortType(event.target.value as PostSortType)
+                }
+            >
+                <option value="latest">최신순</option>
+                <option value="oldest">오래된순</option>
+                <option value="mostCommented">댓글 많은순</option>
+            </select>
 
             <PostList
                 posts={posts}
