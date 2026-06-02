@@ -54,37 +54,12 @@ export default function CommentItem({
 
     return (
         <li className="py-4">
-            {isEditing ? (
-                <form className="flex flex-col gap-2" onSubmit={handleSubmitEdit}>
-                    <textarea
-                        className="min-h-24 rounded-kta-md border border-kta-border px-3 py-2 text-sm outline-none focus:border-kta-navy"
-                        value={content}
-                        onChange={(event) => setContent(event.target.value)}
-                    />
-                    <div className="flex gap-2">
-                        <button
-                            className="rounded-kta-md bg-kta-navy px-3 py-2 text-sm font-bold text-white"
-                            type="submit"
-                        >
-                            수정 완료
-                        </button>
-                        <button
-                            className="rounded-kta-md bg-kta-subtle px-3 py-2 text-sm font-bold text-kta-muted"
-                            type="button"
-                            onClick={handleCancelEdit}
-                        >
-                            취소
-                        </button>
-                    </div>
-                </form>
-            ) : (
-                <p className="text-sm leading-6 text-kta-text">
-                    {comment.content}
-                </p>
-            )}
-            <div className="mt-2 flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-kta-muted">
-                    {comment.author} · {formatDate(comment.createdAt)}
+                    <span className="font-extrabold text-kta-text">
+                        {comment.author}
+                    </span>{" "}
+                    · {formatDate(comment.createdAt)}
                     {isEdited(comment.createdAt, comment.updatedAt) &&
                         " (수정됨)"}
                 </p>
@@ -114,6 +89,38 @@ export default function CommentItem({
                     )}
                 </div>
             </div>
+
+            {isEditing ? (
+                <form
+                    className="mt-3 flex flex-col gap-2"
+                    onSubmit={handleSubmitEdit}
+                >
+                    <textarea
+                        className="min-h-24 rounded-kta-md border border-kta-border px-3 py-2 text-sm outline-none focus:border-kta-navy"
+                        value={content}
+                        onChange={(event) => setContent(event.target.value)}
+                    />
+                    <div className="flex gap-2">
+                        <button
+                            className="rounded-kta-md bg-kta-navy px-3 py-2 text-sm font-bold text-white"
+                            type="submit"
+                        >
+                            수정 완료
+                        </button>
+                        <button
+                            className="rounded-kta-md bg-kta-subtle px-3 py-2 text-sm font-bold text-kta-muted"
+                            type="button"
+                            onClick={handleCancelEdit}
+                        >
+                            취소
+                        </button>
+                    </div>
+                </form>
+            ) : (
+                <p className="mt-2 text-sm leading-6 text-kta-text">
+                    {comment.content}
+                </p>
+            )}
         </li>
     );
 }
