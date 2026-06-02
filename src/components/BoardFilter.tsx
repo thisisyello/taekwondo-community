@@ -1,3 +1,4 @@
+import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router";
 import { BOARD_FILTER_OPTIONS } from "../types/board";
 import type { BoardFilterType } from "../types/board";
@@ -34,7 +35,7 @@ export default function BoardFilter({
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-kta-navy text-sm font-black text-white"
                 to="/search"
             >
-                🔍
+                <FiSearch aria-hidden="true" />
             </Link>
         </div>
     );

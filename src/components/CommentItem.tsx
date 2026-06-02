@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiMoreVertical } from "react-icons/fi";
 import type { Comment } from "../types/board";
 import { formatDate, isEdited } from "../utils/date";
 
@@ -92,7 +93,7 @@ export default function CommentItem({
                         className="rounded-full bg-kta-subtle px-3 py-1 text-xs font-bold text-kta-muted"
                         onClick={handleToggleMenu}
                     >
-                        메뉴
+                        <FiMoreVertical aria-hidden="true" />
                     </button>
 
                     {isMenuOpen && (

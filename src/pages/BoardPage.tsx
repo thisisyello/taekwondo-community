@@ -1,3 +1,4 @@
+import { FiEdit3 } from "react-icons/fi";
 import { Link } from "react-router";
 import BoardFilter from "../components/BoardFilter";
 import PostList from "../components/PostList";
@@ -47,9 +48,10 @@ export default function BoardPage({
                 />
 
                 <Link
-                    className="fixed bottom-5 right-5 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md sm:static sm:self-end"
+                    className="fixed bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md sm:static sm:self-end"
                     to="/posts/new"
                 >
+                    <FiEdit3 aria-hidden="true" />
                     글쓰기
                 </Link>
             </div>

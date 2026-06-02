@@ -1,3 +1,4 @@
+import { FiHeart, FiMessageCircle } from "react-icons/fi";
 import { Link } from "react-router";
 import { BOARD_LABELS } from "../types/board";
 import type { Post } from "../types/board";
@@ -34,12 +35,14 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
 
                     <div className="flex shrink-0 gap-1 text-xs font-bold">
                         {commentCount > 0 && (
-                            <span className="rounded-full bg-red-50 px-2 py-1 text-kta-red">
-                                댓글 {commentCount}
+                            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-kta-red">
+                                <FiMessageCircle aria-hidden="true" />
+                                {commentCount}
                             </span>
                         )}
-                        <span className="rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
-                            공감 {post.likeCount}
+                        <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
+                            <FiHeart aria-hidden="true" />
+                            {post.likeCount}
                         </span>
                     </div>
                 </div>

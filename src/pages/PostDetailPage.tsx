@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiArrowLeft, FiHeart, FiMoreVertical } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
@@ -47,15 +48,19 @@ export default function PostDetailPage({
         <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
             <div className="mx-auto flex max-w-3xl flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <Link className="text-sm font-bold text-kta-navy" to="/">
-                        목록으로
+                    <Link
+                        className="inline-flex items-center gap-1 text-sm font-bold text-kta-navy"
+                        to="/"
+                    >
+                        <FiArrowLeft aria-hidden="true" />
+                        목록
                     </Link>
                     <div className="relative">
                         <button
                             className="rounded-full bg-kta-surface px-4 py-2 text-sm font-bold text-kta-navy shadow-kta-sm"
                             onClick={() => setIsMenuOpen((prev) => !prev)}
                         >
-                            메뉴
+                            <FiMoreVertical aria-hidden="true" />
                         </button>
 
                         {isMenuOpen && (
@@ -97,7 +102,8 @@ export default function PostDetailPage({
                         className="mt-6 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-kta-red"
                         onClick={() => onLikePost(post.id)}
                     >
-                        공감 {post.likeCount}
+                        <FiHeart aria-hidden="true" className="inline" /> 공감{" "}
+                        {post.likeCount}
                     </button>
                 </article>
 
