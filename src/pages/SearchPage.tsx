@@ -13,20 +13,41 @@ export default function SearchPage({
     posts,
     commentCountsByPostId,
 }: SearchPageProps) {
-    const [searchKeyword, setSearchKeyword] = useState("");
+    const [inputKeyword, setInputKeyword] = useState("");
+    const [submittedKeyword, setSubmittedKeyword] = useState("");
+    const [recentKeywords, setRecentKeywords] = useState<string[]>([]);
     const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
     const [postSortType, setPostSortType] = useState<PostSortType>("latest");
 
     const searchResults = filterPostsBySearch(
         posts,
         searchTarget,
-        searchKeyword,
+        submittedKeyword,
     );
     const sortedSearchResults = sortPosts(
         searchResults,
         postSortType,
         commentCountsByPostId,
     );
+    const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
+
+    const submitKeyword = (keyword: string) => {
+        const nextKeyword = keyword.trim();
+
+        if (!nextKeyword) return;
+
+        setSubmittedKeyword(nextKeyword);
+        setInputKeyword(nextKeyword);
+        setRecentKeywords((prev) => [
+            nextKeyword,
+            ...prev.filter((item) => item !== nextKeyword),
+        ].slice(0, 5));
+    };
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        submitKeyword(inputKeyword);
+    };
 
     return (
         <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
@@ -39,7 +60,10 @@ export default function SearchPage({
                     <div className="w-12" />
                 </div>
 
-                <div className="grid gap-2 rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm sm:grid-cols-[120px_1fr]">
+                <form
+                    className="grid gap-2 rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm sm:grid-cols-[120px_1fr_88px]"
+                    onSubmit={handleSubmit}
+                >
                     <select
                         className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none focus:border-kta-navy"
                         value={searchTarget}
@@ -56,17 +80,50 @@ export default function SearchPage({
                         autoFocus
                         className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none placeholder:text-kta-muted focus:border-kta-navy"
                         placeholder="검색어를 입력하세요"
-                        value={searchKeyword}
-                        onChange={(event) => setSearchKeyword(event.target.value)}
+                        value={inputKeyword}
+                        onChange={(event) => setInputKeyword(event.target.value)}
                     />
-                </div>
+                    <button
+                        className="h-11 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
+                        type="submit"
+                    >
+                        검색
+                    </button>
+                </form>
 
-                <PostList
-                    posts={sortedSearchResults}
-                    commentCountsByPostId={commentCountsByPostId}
-                    postSortType={postSortType}
-                    onChangePostSortType={setPostSortType}
-                />
+                {hasSubmittedKeyword ? (
+                    <PostList
+                        posts={sortedSearchResults}
+                        commentCountsByPostId={commentCountsByPostId}
+                        postSortType={postSortType}
+                        onChangePostSortType={setPostSortType}
+                    />
+                ) : (
+                    <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
+                        <h2 className="text-base font-black text-kta-navy">
+                            최근 검색어
+                        </h2>
+                        {recentKeywords.length === 0 ? (
+                            <p className="mt-3 text-sm text-kta-muted">
+                                아직 검색어가 없습니다.
+                            </p>
+                        ) : (
+                            <ul className="mt-3 flex flex-wrap gap-2">
+                                {recentKeywords.map((keyword) => (
+                                    <li key={keyword}>
+                                        <button
+                                            className="rounded-full bg-kta-subtle px-3 py-2 text-sm font-bold text-kta-muted"
+                                            onClick={() => submitKeyword(keyword)}
+                                            type="button"
+                                        >
+                                            {keyword}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </section>
+                )}
             </div>
         </section>
     );
