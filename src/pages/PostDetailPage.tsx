@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiArrowLeft, FiHeart, FiMoreVertical } from "react-icons/fi";
+import { FiArrowLeft, FiEye, FiHeart, FiMoreVertical } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
@@ -95,6 +95,12 @@ export default function PostDetailPage({
                         {isEdited(post.createdAt, post.updatedAt) &&
                             " (수정됨)"}
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-2 text-sm font-bold">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-3 py-1 text-kta-navy">
+                            <FiEye aria-hidden="true" />
+                            조회 {post.viewCount}
+                        </span>
+                    </div>
                     <p className="mt-6 whitespace-pre-wrap text-base leading-8 text-kta-text">
                         {post.content}
                     </p>

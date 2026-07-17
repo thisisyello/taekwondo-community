@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router";
 import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
@@ -40,6 +40,7 @@ export default function App() {
             id: Date.now(),
             ...post,
             likeCount: 0,
+            viewCount: 0,
             createdAt: now,
             updatedAt: now,
         };
@@ -73,6 +74,16 @@ export default function App() {
             prev.map((post) =>
                 post.id === id
                     ? { ...post, likeCount: post.likeCount + 1 }
+                    : post,
+            ),
+        );
+    };
+
+    const handleViewPost = (id: number) => {
+        setPosts((prev) =>
+            prev.map((post) =>
+                post.id === id
+                    ? { ...post, viewCount: post.viewCount + 1 }
                     : post,
             ),
         );
@@ -152,6 +163,7 @@ export default function App() {
                         onUpdateComment={handleUpdateComment}
                         onDeleteComment={handleDeleteComment}
                         onLikePost={handleLikePost}
+                        onViewPost={handleViewPost}
                         onDeletePost={handleDeletePost}
                     />
                 }
@@ -180,6 +192,7 @@ type PostDetailRouteProps = PostRouteProps & {
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
     onLikePost: (id: number) => void;
+    onViewPost: (id: number) => void;
     onDeletePost: (id: number) => void;
 };
 
@@ -190,10 +203,21 @@ function PostDetailRoute({
     onUpdateComment,
     onDeleteComment,
     onLikePost,
+    onViewPost,
     onDeletePost,
 }: PostDetailRouteProps) {
     const { postId } = useParams();
+    const viewedPostIds = useRef<Set<number>>(new Set());
     const post = posts.find((item) => item.id === Number(postId));
+
+    useEffect(() => {
+        const currentPostId = Number(postId);
+
+        if (!post || viewedPostIds.current.has(currentPostId)) return;
+
+        viewedPostIds.current.add(currentPostId);
+        onViewPost(currentPostId);
+    }, [onViewPost, post, postId]);
 
     if (!post) {
         return <Navigate to="/" replace />;

@@ -1,4 +1,4 @@
-import { FiHeart, FiMessageCircle } from "react-icons/fi";
+import { FiEye, FiHeart, FiMessageCircle } from "react-icons/fi";
 import { Link } from "react-router";
 import { BOARD_LABELS } from "../types/board";
 import type { Post } from "../types/board";
@@ -40,6 +40,10 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
                                 {commentCount}
                             </span>
                         )}
+                        <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
+                            <FiEye aria-hidden="true" />
+                            {post.viewCount}
+                        </span>
                         <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
                             <FiHeart aria-hidden="true" />
                             {post.likeCount}

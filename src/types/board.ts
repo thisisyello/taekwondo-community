@@ -44,13 +44,14 @@ export type Post = {
     author: string;
     board: BoardType;
     likeCount: number;
+    viewCount: number;
     createdAt: string;
     updatedAt: string;
 };
 
 export type PostFormData = Omit<
     Post,
-    "id" | "likeCount" | "createdAt" | "updatedAt"
+    "id" | "likeCount" | "viewCount" | "createdAt" | "updatedAt"
 >;
 
 export type Comment = {
