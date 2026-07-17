@@ -22,7 +22,7 @@ export default function BoardPage({
     onSelectBoardType,
 }: BoardPageProps) {
     return (
-        <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
+        <section className="min-h-svh bg-kta-bg px-4 pb-24 pt-5 text-kta-text">
             <div className="mx-auto flex max-w-3xl flex-col gap-4">
                 <header className="rounded-kta-lg bg-kta-navy px-5 py-6 text-white shadow-kta-md">
                     <p className="text-sm font-semibold text-white/75">
@@ -48,7 +48,7 @@ export default function BoardPage({
                 />
 
                 <Link
-                    className="fixed bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md sm:static sm:self-end"
+                    className="fixed bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md"
                     to="/posts/new"
                 >
                     <FiEdit3 aria-hidden="true" />
