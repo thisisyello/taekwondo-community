@@ -84,9 +84,16 @@ export default function PostDetailPage({
                 </div>
 
                 <article className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
-                    <p className="text-xs font-bold text-kta-red">
-                        {BOARD_LABELS[post.board]}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-1 text-xs font-bold">
+                        {post.isNotice && (
+                            <span className="rounded-full bg-red-50 px-2 py-0.5 text-kta-red">
+                                공지
+                            </span>
+                        )}
+                        <span className="text-kta-red">
+                            {BOARD_LABELS[post.board]}
+                        </span>
+                    </div>
                     <div className="mt-2 flex items-start justify-between gap-3">
                         <h1 className="min-w-0 text-2xl font-black leading-tight text-kta-text">
                             {post.title}

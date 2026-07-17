@@ -41,6 +41,7 @@ export default function App() {
             ...post,
             likeCount: 0,
             viewCount: 0,
+            isNotice: false,
             createdAt: now,
             updatedAt: now,
         };
