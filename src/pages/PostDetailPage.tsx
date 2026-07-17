@@ -87,20 +87,20 @@ export default function PostDetailPage({
                     <p className="text-xs font-bold text-kta-red">
                         {BOARD_LABELS[post.board]}
                     </p>
-                    <h1 className="mt-2 text-2xl font-black leading-tight text-kta-text">
-                        {post.title}
-                    </h1>
+                    <div className="mt-2 flex items-start justify-between gap-3">
+                        <h1 className="min-w-0 text-2xl font-black leading-tight text-kta-text">
+                            {post.title}
+                        </h1>
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-kta-subtle px-3 py-1 text-sm font-bold text-kta-navy">
+                            <FiEye aria-hidden="true" />
+                            조회 {post.viewCount}
+                        </span>
+                    </div>
                     <p className="mt-3 text-sm text-kta-muted">
                         {post.author} · {formatDate(post.createdAt)}
                         {isEdited(post.createdAt, post.updatedAt) &&
                             " (수정됨)"}
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2 text-sm font-bold">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-3 py-1 text-kta-navy">
-                            <FiEye aria-hidden="true" />
-                            조회 {post.viewCount}
-                        </span>
-                    </div>
                     <p className="mt-6 whitespace-pre-wrap text-base leading-8 text-kta-text">
                         {post.content}
                     </p>

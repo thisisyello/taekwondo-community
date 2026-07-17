@@ -34,17 +34,17 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
                     </div>
 
                     <div className="flex shrink-0 gap-1 text-xs font-bold">
-                        {commentCount > 0 && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-kta-red">
-                                <FiMessageCircle aria-hidden="true" />
-                                {commentCount}
-                            </span>
-                        )}
                         <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
                             <FiEye aria-hidden="true" />
                             {post.viewCount}
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
+                        {commentCount > 0 && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
+                                <FiMessageCircle aria-hidden="true" />
+                                {commentCount}
+                            </span>
+                        )}
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-kta-red">
                             <FiHeart aria-hidden="true" />
                             {post.likeCount}
                         </span>
