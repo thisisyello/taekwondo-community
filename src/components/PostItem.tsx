@@ -25,16 +25,9 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
             <Link className="block px-5 py-4" to={`/posts/${post.id}`}>
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-1 text-xs font-bold">
-                            {post.isNotice && (
-                                <span className="rounded-full bg-red-50 px-2 py-0.5 text-kta-red">
-                                    공지
-                                </span>
-                            )}
-                            <span className="text-kta-red">
-                                {BOARD_LABELS[post.board]}
-                            </span>
-                        </div>
+                        <p className="text-xs font-bold text-kta-red">
+                            {BOARD_LABELS[post.board]}
+                        </p>
                         <h3 className="mt-1 line-clamp-1 text-base font-extrabold text-kta-text">
                             {post.title}
                         </h3>
