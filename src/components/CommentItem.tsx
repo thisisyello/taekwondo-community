@@ -17,6 +17,8 @@ export default function CommentItem({
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [content, setContent] = useState(comment.content);
+    const [hasSubmittedEdit, setHasSubmittedEdit] = useState(false);
+    const contentError = hasSubmittedEdit && !content.trim();
 
     const handleToggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -25,21 +27,26 @@ export default function CommentItem({
     const handleSubmitEdit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        setHasSubmittedEdit(true);
+
         if (!content.trim()) return;
 
         onUpdateComment(comment.id, content);
         setIsEditing(false);
         setIsMenuOpen(false);
+        setHasSubmittedEdit(false);
     };
 
     const handleCancelEdit = () => {
         setContent(comment.content);
         setIsEditing(false);
+        setHasSubmittedEdit(false);
     };
 
     const handleStartEdit = () => {
         setIsMenuOpen(false);
         setIsEditing(true);
+        setHasSubmittedEdit(false);
     };
 
     const handleDelete = () => {
@@ -96,10 +103,19 @@ export default function CommentItem({
                     onSubmit={handleSubmitEdit}
                 >
                     <textarea
-                        className="min-h-24 rounded-kta-md border border-kta-border px-3 py-2 text-sm outline-none focus:border-kta-navy"
+                        className={
+                            contentError
+                                ? "min-h-24 rounded-kta-md border border-kta-red px-3 py-2 text-sm outline-none focus:border-kta-red"
+                                : "min-h-24 rounded-kta-md border border-kta-border px-3 py-2 text-sm outline-none focus:border-kta-navy"
+                        }
                         value={content}
                         onChange={(event) => setContent(event.target.value)}
                     />
+                    {contentError && (
+                        <p className="text-xs font-semibold text-kta-red">
+                            댓글 내용을 입력해주세요.
+                        </p>
+                    )}
                     <div className="flex gap-2">
                         <button
                             className="rounded-kta-md bg-kta-navy px-3 py-2 text-sm font-bold text-white"
