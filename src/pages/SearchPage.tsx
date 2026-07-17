@@ -30,6 +30,7 @@ export default function SearchPage({
         commentCountsByPostId,
     );
     const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
+    const searchTargetLabel = getSearchTargetLabel(searchTarget);
 
     const submitKeyword = (keyword: string) => {
         const nextKeyword = keyword.trim();
@@ -92,12 +93,21 @@ export default function SearchPage({
                 </form>
 
                 {hasSubmittedKeyword ? (
-                    <PostList
-                        posts={sortedSearchResults}
-                        commentCountsByPostId={commentCountsByPostId}
-                        postSortType={postSortType}
-                        onChangePostSortType={setPostSortType}
-                    />
+                    <section className="flex flex-col gap-3">
+                        <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
+                            <p className="text-sm font-bold text-kta-text">
+                                {searchTargetLabel}에서 "{submittedKeyword}" 검색
+                                결과 {sortedSearchResults.length}건
+                            </p>
+                        </div>
+                        <PostList
+                            posts={sortedSearchResults}
+                            commentCountsByPostId={commentCountsByPostId}
+                            postSortType={postSortType}
+                            onChangePostSortType={setPostSortType}
+                            emptyMessage="검색 결과가 없습니다."
+                        />
+                    </section>
                 ) : (
                     <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
                         <h2 className="text-base font-black text-kta-navy">
@@ -128,3 +138,11 @@ export default function SearchPage({
         </section>
     );
 }
+
+const getSearchTargetLabel = (searchTarget: SearchTarget) => {
+    if (searchTarget === "title") return "제목";
+    if (searchTarget === "content") return "내용";
+    if (searchTarget === "author") return "작성자";
+
+    return "전체";
+};

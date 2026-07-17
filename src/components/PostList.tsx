@@ -7,6 +7,7 @@ type PostListProps = {
     commentCountsByPostId: Record<number, number>;
     postSortType: PostSortType;
     onChangePostSortType: (sortType: PostSortType) => void;
+    emptyMessage?: string;
 };
 
 export default function PostList({
@@ -14,6 +15,7 @@ export default function PostList({
     commentCountsByPostId,
     postSortType,
     onChangePostSortType,
+    emptyMessage = "게시글이 없습니다.",
 }: PostListProps) {
     return (
         <section className="flex flex-col gap-3">
@@ -35,7 +37,7 @@ export default function PostList({
 
             {posts.length === 0 ? (
                 <p className="rounded-kta-lg border border-dashed border-kta-border bg-kta-surface px-5 py-10 text-center text-sm text-kta-muted">
-                    게시글이 없습니다.
+                    {emptyMessage}
                 </p>
             ) : (
                 <ul className="flex flex-col gap-3">
