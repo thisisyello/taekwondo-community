@@ -38,12 +38,10 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
                             <FiEye aria-hidden="true" />
                             {post.viewCount}
                         </span>
-                        {commentCount > 0 && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
-                                <FiMessageCircle aria-hidden="true" />
-                                {commentCount}
-                            </span>
-                        )}
+                        <span className="inline-flex items-center gap-1 rounded-full bg-kta-subtle px-2 py-1 text-kta-navy">
+                            <FiMessageCircle aria-hidden="true" />
+                            {commentCount}
+                        </span>
                         <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-kta-red">
                             <FiHeart aria-hidden="true" />
                             {post.likeCount}

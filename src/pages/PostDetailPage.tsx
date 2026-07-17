@@ -114,7 +114,9 @@ export default function PostDetailPage({
                 </article>
 
                 <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
-                    <h2 className="text-lg font-black text-kta-navy">댓글</h2>
+                    <h2 className="text-lg font-black text-kta-navy">
+                        댓글 {comments.length}
+                    </h2>
                     <div className="mt-4">
                         <CommentForm
                             onAddComment={(comment) =>
