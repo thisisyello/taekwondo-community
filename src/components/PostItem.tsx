@@ -9,16 +9,6 @@ type PostItemProps = {
     commentCount: number;
 };
 
-const PREVIEW_MAX_LENGTH = 60;
-
-const getPostPreview = (content: string) => {
-    if (content.length <= PREVIEW_MAX_LENGTH) {
-        return content;
-    }
-
-    return `${content.slice(0, PREVIEW_MAX_LENGTH)}...`;
-};
-
 export default function PostItem({ post, commentCount }: PostItemProps) {
     return (
         <li className="rounded-kta-lg border border-kta-border bg-kta-surface shadow-kta-sm transition hover:-translate-y-0.5 hover:shadow-kta-md">
@@ -26,12 +16,12 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
                 <p className="text-xs font-bold text-kta-red">
                     {BOARD_LABELS[post.board]}
                 </p>
-                <h3 className="mt-1 line-clamp-2 text-base font-extrabold leading-6 text-kta-text">
+                <h3 className="mt-1 line-clamp-1 text-base font-extrabold leading-6 text-kta-text">
                     {post.title}
                 </h3>
 
                 <p className="mt-2 line-clamp-2 text-sm leading-6 text-kta-muted">
-                    {getPostPreview(post.content)}
+                    {post.content}
                 </p>
 
                 <div className="mt-3 flex flex-col gap-2 text-xs font-medium text-kta-muted sm:flex-row sm:items-center sm:justify-between">
