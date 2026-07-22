@@ -64,7 +64,7 @@ export default function CommentItem({
             <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-kta-muted">
                     <span className="font-extrabold text-kta-text">
-                        {comment.author}
+                        {comment.author.nickname}
                     </span>{" "}
                     · {formatDate(comment.createdAt)}
                     {isEdited(comment.createdAt, comment.updatedAt) &&

@@ -6,6 +6,11 @@ export type SearchTarget = "all" | "title" | "content" | "author";
 
 export type PostSortType = "latest" | "oldest" | "mostCommented";
 
+export type BoardAuthor = {
+    id: string;
+    nickname: string;
+};
+
 export type BoardOption = {
     type: BoardType;
     label: string;
@@ -41,7 +46,7 @@ export type Post = {
     id: number;
     title: string;
     content: string;
-    author: string;
+    author: BoardAuthor;
     board: BoardType;
     likeCount: number;
     viewCount: number;
@@ -51,19 +56,19 @@ export type Post = {
 
 export type PostFormData = Omit<
     Post,
-    "id" | "likeCount" | "viewCount" | "createdAt" | "updatedAt"
+    "id" | "author" | "likeCount" | "viewCount" | "createdAt" | "updatedAt"
 >;
 
 export type Comment = {
     id: number;
     postId: number;
     content: string;
-    author: string;
+    author: BoardAuthor;
     createdAt: string;
     updatedAt: string;
 };
 
 export type CommentFormData = Omit<
     Comment,
-    "id" | "postId" | "createdAt" | "updatedAt"
+    "id" | "postId" | "author" | "createdAt" | "updatedAt"
 >;

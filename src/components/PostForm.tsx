@@ -1,16 +1,14 @@
+import { useState } from "react";
 import { BOARD_OPTIONS } from "../types/board";
 import type { BoardType } from "../types/board";
-import { useState } from "react";
 
 type PostFormProps = {
   mode: "create" | "edit";
   title: string;
   content: string;
-  author: string;
   board: BoardType;
   onChangeTitle: (value: string) => void;
   onChangeContent: (value: string) => void;
-  onChangeAuthor: (value: string) => void;
   onChangeBoard: (value: BoardType) => void;
   onSubmit: () => void;
   onCancel: () => void;
@@ -20,11 +18,9 @@ export default function PostForm({
   mode,
   title,
   content,
-  author,
   board,
   onChangeTitle,
   onChangeContent,
-  onChangeAuthor,
   onChangeBoard,
   onSubmit,
   onCancel,
@@ -32,18 +28,17 @@ export default function PostForm({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const titleError = hasSubmitted && !title.trim();
   const contentError = hasSubmitted && !content.trim();
-  const authorError = hasSubmitted && !author.trim();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setHasSubmitted(true);
 
-    if (titleError || contentError || authorError) {
+    if (titleError || contentError) {
       return;
     }
 
-    if (!title.trim() || !content.trim() || !author.trim()) {
+    if (!title.trim() || !content.trim()) {
       return;
     }
 
@@ -84,24 +79,6 @@ export default function PostForm({
         {contentError && (
           <p className="text-xs font-semibold text-kta-red">
             내용을 입력해주세요.
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <input
-          className={
-            authorError
-              ? "h-12 rounded-kta-md border border-kta-red px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-red"
-              : "h-12 rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy"
-          }
-          placeholder="작성자"
-          value={author}
-          onChange={(e) => onChangeAuthor(e.target.value)}
-        />
-        {authorError && (
-          <p className="text-xs font-semibold text-kta-red">
-            작성자를 입력해주세요.
           </p>
         )}
       </div>

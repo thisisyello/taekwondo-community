@@ -11,6 +11,7 @@ import {
     sortPosts,
 } from "./utils/postList";
 import type {
+    BoardAuthor,
     BoardFilterType,
     Comment,
     CommentFormData,
@@ -18,6 +19,20 @@ import type {
     PostFormData,
     PostSortType,
 } from "./types/board";
+import type { CurrentUser } from "./types/user";
+
+const currentUser: CurrentUser = {
+    id: "user-current",
+    nickname: "현재회원",
+    role: "member",
+    createdAt: "2026-07-22T00:00:00.000Z",
+    updatedAt: "2026-07-22T00:00:00.000Z",
+};
+
+const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
+    id: user.id,
+    nickname: user.nickname,
+});
 
 export default function App() {
     const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -39,6 +54,7 @@ export default function App() {
         const newPost: Post = {
             id: Date.now(),
             ...post,
+            author: getBoardAuthor(currentUser),
             likeCount: 0,
             viewCount: 0,
             createdAt: now,
@@ -95,6 +111,7 @@ export default function App() {
             id: Date.now(),
             postId,
             ...comment,
+            author: getBoardAuthor(currentUser),
             createdAt: now,
             updatedAt: now,
         };

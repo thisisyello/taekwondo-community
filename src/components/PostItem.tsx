@@ -26,7 +26,7 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
 
                 <div className="mt-3 flex flex-col gap-2 text-xs font-medium text-kta-muted sm:flex-row sm:items-center sm:justify-between">
                     <p>
-                        {post.author} · {formatDate(post.createdAt)}
+                        {post.author.nickname} · {formatDate(post.createdAt)}
                         {isEdited(post.createdAt, post.updatedAt) &&
                             " (수정됨)"}
                     </p>

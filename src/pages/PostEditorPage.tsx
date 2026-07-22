@@ -19,7 +19,6 @@ const getInitialForm = (props: PostEditorPageProps): PostFormData => {
         return {
             title: props.post.title,
             content: props.post.content,
-            author: props.post.author,
             board: props.post.board,
         };
     }
@@ -27,7 +26,6 @@ const getInitialForm = (props: PostEditorPageProps): PostFormData => {
     return {
         title: "",
         content: "",
-        author: "",
         board: "free",
     };
 };
@@ -50,7 +48,7 @@ export default function PostEditorPage(props: PostEditorPageProps) {
     };
 
     const handleSubmit = () => {
-        if (!form.title.trim() || !form.content.trim() || !form.author.trim()) {
+        if (!form.title.trim() || !form.content.trim()) {
             return;
         }
 
@@ -81,13 +79,11 @@ export default function PostEditorPage(props: PostEditorPageProps) {
                         mode={mode}
                         title={form.title}
                         content={form.content}
-                        author={form.author}
                         board={form.board}
                         onChangeTitle={(value) => updateForm("title", value)}
                         onChangeContent={(value) =>
                             updateForm("content", value)
                         }
-                        onChangeAuthor={(value) => updateForm("author", value)}
                         onChangeBoard={(value: BoardType) =>
                             updateForm("board", value)
                         }

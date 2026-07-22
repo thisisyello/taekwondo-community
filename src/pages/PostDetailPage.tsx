@@ -102,7 +102,7 @@ export default function PostDetailPage({
                         </span>
                     </div>
                     <p className="mt-3 text-sm text-kta-muted">
-                        {post.author} · {formatDate(post.createdAt)}
+                        {post.author.nickname} · {formatDate(post.createdAt)}
                         {isEdited(post.createdAt, post.updatedAt) &&
                             " (수정됨)"}
                     </p>

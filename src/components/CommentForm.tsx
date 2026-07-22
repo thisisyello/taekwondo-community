@@ -7,25 +7,21 @@ type CommentFormProps = {
 
 export default function CommentForm({ onAddComment }: CommentFormProps) {
     const [content, setContent] = useState("");
-    const [author, setAuthor] = useState("");
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const contentError = hasSubmitted && !content.trim();
-    const authorError = hasSubmitted && !author.trim();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         setHasSubmitted(true);
 
-        if (!content.trim() || !author.trim()) return;
+        if (!content.trim()) return;
 
         onAddComment({
             content,
-            author,
         });
 
         setContent("");
-        setAuthor("");
         setHasSubmitted(false);
     };
 
@@ -45,23 +41,6 @@ export default function CommentForm({ onAddComment }: CommentFormProps) {
                 {contentError && (
                     <p className="text-xs font-semibold text-kta-red">
                         댓글 내용을 입력해주세요.
-                    </p>
-                )}
-            </div>
-            <div className="flex flex-col gap-1">
-                <input
-                    className={
-                        authorError
-                            ? "h-11 rounded-kta-md border border-kta-red px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-red"
-                            : "h-11 rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy"
-                    }
-                    placeholder="작성자"
-                    value={author}
-                    onChange={(event) => setAuthor(event.target.value)}
-                />
-                {authorError && (
-                    <p className="text-xs font-semibold text-kta-red">
-                        작성자를 입력해주세요.
                     </p>
                 )}
             </div>

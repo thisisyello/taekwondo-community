@@ -40,9 +40,19 @@ export const filterPostsBySearch = (
 
     return posts.filter((post) => {
         if (searchTarget === "all") {
-            return [post.title, post.content, post.author].some((value) =>
+            return [
+                post.title,
+                post.content,
+                post.author.nickname,
+            ].some((value) =>
                 value.toLowerCase().includes(normalizedSearchKeyword),
             );
+        }
+
+        if (searchTarget === "author") {
+            return post.author.nickname
+                .toLowerCase()
+                .includes(normalizedSearchKeyword);
         }
 
         return post[searchTarget]
