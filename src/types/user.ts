@@ -2,6 +2,10 @@ export type UserRole = "member" | "admin";
 
 export type User = {
     id: string;
+    loginId: string;
+    name: string;
+    birthDate: string;
+    phoneNumber: string;
     nickname: string;
     profileImageUrl?: string;
     role: UserRole;
@@ -10,3 +14,11 @@ export type User = {
 };
 
 export type CurrentUser = User;
+
+export type SignupFormData = {
+    loginId: string;
+    name: string;
+    birthDate: string;
+    phoneNumber: string;
+    nickname: string;
+};

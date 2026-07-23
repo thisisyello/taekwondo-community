@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
+import type { SignupFormData } from "../types/user";
 
 type SignupPageProps = {
-    onSignup: (loginId: string, nickname: string) => void;
+    onSignup: (signupData: SignupFormData) => void;
 };
 
 export default function SignupPage({ onSignup }: SignupPageProps) {
     const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [birthDate, setBirthDate] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [loginId, setLoginId] = useState("");
     const [nickname, setNickname] = useState("");
     const [password, setPassword] = useState("");
@@ -17,6 +21,9 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
         useState(false);
     const [hasSubmitted, setHasSubmitted] = useState(false);
 
+    const nameError = hasSubmitted && !name.trim();
+    const birthDateError = hasSubmitted && !birthDate;
+    const phoneNumberError = hasSubmitted && !phoneNumber.trim();
     const loginIdError = hasSubmitted && !loginId.trim();
     const nicknameError = hasSubmitted && !nickname.trim();
     const passwordError = hasSubmitted && !password.trim();
@@ -32,6 +39,9 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
         setHasSubmitted(true);
 
         if (
+            !name.trim() ||
+            !birthDate ||
+            !phoneNumber.trim() ||
             !loginId.trim() ||
             !nickname.trim() ||
             !password.trim() ||
@@ -40,7 +50,13 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
             return;
         }
 
-        onSignup(loginId.trim(), nickname.trim());
+        onSignup({
+            loginId: loginId.trim(),
+            name: name.trim(),
+            birthDate,
+            phoneNumber: phoneNumber.trim(),
+            nickname: nickname.trim(),
+        });
         navigate("/");
     };
 
@@ -60,140 +76,204 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                     className="mt-4 flex flex-col gap-3 rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm"
                     onSubmit={handleSubmit}
                 >
-                    <div className="flex flex-col gap-1">
-                        <div className="grid gap-2 sm:grid-cols-[1fr_104px]">
+                    <fieldset className="flex flex-col gap-3">
+                        <legend className="mb-1 text-sm font-black text-kta-navy">
+                            개인정보
+                        </legend>
+
+                        <div className="flex flex-col gap-1">
                             <input
                                 autoFocus
-                                className={getInputClassName(loginIdError)}
-                                placeholder="아이디"
-                                value={loginId}
+                                className={getInputClassName(nameError)}
+                                placeholder="이름"
+                                value={name}
                                 onChange={(event) =>
-                                    setLoginId(event.target.value)
+                                    setName(event.target.value)
                                 }
                             />
-                            <button
-                                className="h-12 rounded-kta-md bg-kta-subtle px-3 text-sm font-bold text-kta-navy"
-                                type="button"
-                            >
-                                중복체크
-                            </button>
-                        </div>
-                        {loginIdError && (
-                            <p className="text-xs font-semibold text-kta-red">
-                                아이디를 입력해주세요.
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <input
-                            className={getInputClassName(nicknameError)}
-                            placeholder="닉네임"
-                            value={nickname}
-                            onChange={(event) =>
-                                setNickname(event.target.value)
-                            }
-                        />
-                        {nicknameError && (
-                            <p className="text-xs font-semibold text-kta-red">
-                                닉네임을 입력해주세요.
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <div className="relative">
-                            <input
-                                className={getInputClassName(passwordError)}
-                                placeholder="비밀번호"
-                                type={isPasswordVisible ? "text" : "password"}
-                                value={password}
-                                onChange={(event) =>
-                                    setPassword(event.target.value)
-                                }
-                            />
-                            <button
-                                aria-label={
-                                    isPasswordVisible
-                                        ? "비밀번호 숨기기"
-                                        : "비밀번호 보기"
-                                }
-                                className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center text-kta-muted"
-                                onClick={() =>
-                                    setIsPasswordVisible((prev) => !prev)
-                                }
-                                type="button"
-                            >
-                                {isPasswordVisible ? (
-                                    <FiEyeOff aria-hidden="true" />
-                                ) : (
-                                    <FiEye aria-hidden="true" />
-                                )}
-                            </button>
-                        </div>
-                        {passwordError && (
-                            <p className="text-xs font-semibold text-kta-red">
-                                비밀번호를 입력해주세요.
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <div className="relative">
-                            <input
-                                className={getInputClassName(
-                                    passwordConfirmError,
-                                )}
-                                placeholder="비밀번호 확인"
-                                type={
-                                    isPasswordConfirmVisible
-                                        ? "text"
-                                        : "password"
-                                }
-                                value={passwordConfirm}
-                                onChange={(event) =>
-                                    setPasswordConfirm(event.target.value)
-                                }
-                            />
-                            <button
-                                aria-label={
-                                    isPasswordConfirmVisible
-                                        ? "비밀번호 확인 숨기기"
-                                        : "비밀번호 확인 보기"
-                                }
-                                className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center text-kta-muted"
-                                onClick={() =>
-                                    setIsPasswordConfirmVisible(
-                                        (prev) => !prev,
-                                    )
-                                }
-                                type="button"
-                            >
-                                {isPasswordConfirmVisible ? (
-                                    <FiEyeOff aria-hidden="true" />
-                                ) : (
-                                    <FiEye aria-hidden="true" />
-                                )}
-                            </button>
-                        </div>
-                        {hasPasswordConfirmValue &&
-                            isPasswordConfirmMatched && (
-                                <p className="text-xs font-semibold text-kta-navy">
-                                    비밀번호가 일치합니다.
-                                </p>
-                            )}
-                        {hasPasswordConfirmValue &&
-                            !isPasswordConfirmMatched && (
+                            {nameError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    비밀번호가 일치하지 않습니다.
+                                    이름을 입력해주세요.
                                 </p>
                             )}
-                        {!hasPasswordConfirmValue && passwordConfirmError && (
-                            <p className="text-xs font-semibold text-kta-red">
-                                비밀번호 확인을 입력해주세요.
-                            </p>
-                        )}
-                    </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <input
+                                className={getInputClassName(birthDateError)}
+                                type="date"
+                                value={birthDate}
+                                onChange={(event) =>
+                                    setBirthDate(event.target.value)
+                                }
+                            />
+                            {birthDateError && (
+                                <p className="text-xs font-semibold text-kta-red">
+                                    생년월일을 입력해주세요.
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <input
+                                className={getInputClassName(phoneNumberError)}
+                                inputMode="tel"
+                                placeholder="전화번호"
+                                value={phoneNumber}
+                                onChange={(event) =>
+                                    setPhoneNumber(event.target.value)
+                                }
+                            />
+                            {phoneNumberError && (
+                                <p className="text-xs font-semibold text-kta-red">
+                                    전화번호를 입력해주세요.
+                                </p>
+                            )}
+                        </div>
+                    </fieldset>
+
+                    <fieldset className="mt-2 flex flex-col gap-3 border-t border-kta-border pt-4">
+                        <legend className="mb-1 text-sm font-black text-kta-navy">
+                            계정정보
+                        </legend>
+
+                        <div className="flex flex-col gap-1">
+                            <div className="grid gap-2 sm:grid-cols-[1fr_104px]">
+                                <input
+                                    className={getInputClassName(loginIdError)}
+                                    placeholder="아이디"
+                                    value={loginId}
+                                    onChange={(event) =>
+                                        setLoginId(event.target.value)
+                                    }
+                                />
+                                <button
+                                    className="h-12 rounded-kta-md bg-kta-subtle px-3 text-sm font-bold text-kta-navy"
+                                    type="button"
+                                >
+                                    중복체크
+                                </button>
+                            </div>
+                            {loginIdError && (
+                                <p className="text-xs font-semibold text-kta-red">
+                                    아이디를 입력해주세요.
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <input
+                                className={getInputClassName(nicknameError)}
+                                placeholder="공용 닉네임"
+                                value={nickname}
+                                onChange={(event) =>
+                                    setNickname(event.target.value)
+                                }
+                            />
+                            {nicknameError && (
+                                <p className="text-xs font-semibold text-kta-red">
+                                    공용 닉네임을 입력해주세요.
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <div className="relative">
+                                <input
+                                    className={getInputClassName(passwordError)}
+                                    placeholder="비밀번호"
+                                    type={
+                                        isPasswordVisible ? "text" : "password"
+                                    }
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(event.target.value)
+                                    }
+                                />
+                                <button
+                                    aria-label={
+                                        isPasswordVisible
+                                            ? "비밀번호 숨기기"
+                                            : "비밀번호 보기"
+                                    }
+                                    className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center text-kta-muted"
+                                    onClick={() =>
+                                        setIsPasswordVisible((prev) => !prev)
+                                    }
+                                    type="button"
+                                >
+                                    {isPasswordVisible ? (
+                                        <FiEyeOff aria-hidden="true" />
+                                    ) : (
+                                        <FiEye aria-hidden="true" />
+                                    )}
+                                </button>
+                            </div>
+                            {passwordError && (
+                                <p className="text-xs font-semibold text-kta-red">
+                                    비밀번호를 입력해주세요.
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <div className="relative">
+                                <input
+                                    className={getInputClassName(
+                                        passwordConfirmError,
+                                    )}
+                                    placeholder="비밀번호 확인"
+                                    type={
+                                        isPasswordConfirmVisible
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    value={passwordConfirm}
+                                    onChange={(event) =>
+                                        setPasswordConfirm(event.target.value)
+                                    }
+                                />
+                                <button
+                                    aria-label={
+                                        isPasswordConfirmVisible
+                                            ? "비밀번호 확인 숨기기"
+                                            : "비밀번호 확인 보기"
+                                    }
+                                    className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center text-kta-muted"
+                                    onClick={() =>
+                                        setIsPasswordConfirmVisible(
+                                            (prev) => !prev,
+                                        )
+                                    }
+                                    type="button"
+                                >
+                                    {isPasswordConfirmVisible ? (
+                                        <FiEyeOff aria-hidden="true" />
+                                    ) : (
+                                        <FiEye aria-hidden="true" />
+                                    )}
+                                </button>
+                            </div>
+                            {hasPasswordConfirmValue &&
+                                isPasswordConfirmMatched && (
+                                    <p className="text-xs font-semibold text-kta-navy">
+                                        비밀번호가 일치합니다.
+                                    </p>
+                                )}
+                            {hasPasswordConfirmValue &&
+                                !isPasswordConfirmMatched && (
+                                    <p className="text-xs font-semibold text-kta-red">
+                                        비밀번호가 일치하지 않습니다.
+                                    </p>
+                                )}
+                            {!hasPasswordConfirmValue &&
+                                passwordConfirmError && (
+                                    <p className="text-xs font-semibold text-kta-red">
+                                        비밀번호 확인을 입력해주세요.
+                                    </p>
+                                )}
+                        </div>
+                    </fieldset>
 
                     <button
                         className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
