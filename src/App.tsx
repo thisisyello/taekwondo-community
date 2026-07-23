@@ -176,6 +176,7 @@ export default function App() {
                     <PostDetailRoute
                         posts={posts}
                         comments={comments}
+                        currentUserId={currentUser.id}
                         onAddComment={handleAddComment}
                         onUpdateComment={handleUpdateComment}
                         onDeleteComment={handleDeleteComment}
@@ -205,6 +206,7 @@ type PostRouteProps = {
 
 type PostDetailRouteProps = PostRouteProps & {
     comments: Comment[];
+    currentUserId: string;
     onAddComment: (postId: number, comment: CommentFormData) => void;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
@@ -216,6 +218,7 @@ type PostDetailRouteProps = PostRouteProps & {
 function PostDetailRoute({
     posts,
     comments,
+    currentUserId,
     onAddComment,
     onUpdateComment,
     onDeleteComment,
@@ -246,6 +249,7 @@ function PostDetailRoute({
         <PostDetailPage
             post={post}
             comments={postComments}
+            currentUserId={currentUserId}
             onAddComment={onAddComment}
             onUpdateComment={onUpdateComment}
             onDeleteComment={onDeleteComment}

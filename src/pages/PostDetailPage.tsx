@@ -15,6 +15,7 @@ import { formatDate, isEdited } from "../utils/date";
 type PostDetailPageProps = {
     post: Post;
     comments: Comment[];
+    currentUserId: string;
     onAddComment: (postId: number, comment: CommentFormData) => void;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
@@ -25,6 +26,7 @@ type PostDetailPageProps = {
 export default function PostDetailPage({
     post,
     comments,
+    currentUserId,
     onAddComment,
     onUpdateComment,
     onDeleteComment,
@@ -33,6 +35,7 @@ export default function PostDetailPage({
 }: PostDetailPageProps) {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const canManagePost = currentUserId === post.author.id;
 
     const handleStartEdit = () => {
         setIsMenuOpen(false);
@@ -60,32 +63,34 @@ export default function PostDetailPage({
                         <FiArrowLeft aria-hidden="true" />
                         목록
                     </Link>
-                    <div className="relative">
-                        <button
-                            className="rounded-full bg-kta-surface px-4 py-2 text-sm font-bold text-kta-navy shadow-kta-sm"
-                            onClick={() => setIsMenuOpen((prev) => !prev)}
-                        >
-                            <FiMoreVertical aria-hidden="true" />
-                        </button>
+                    {canManagePost && (
+                        <div className="relative">
+                            <button
+                                className="rounded-full bg-kta-surface px-4 py-2 text-sm font-bold text-kta-navy shadow-kta-sm"
+                                onClick={() => setIsMenuOpen((prev) => !prev)}
+                            >
+                                <FiMoreVertical aria-hidden="true" />
+                            </button>
 
-                        {isMenuOpen && (
-                            <div className="absolute right-0 top-11 z-10 flex min-w-28 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
-                                <Link
-                                    className="px-4 py-3 text-sm font-semibold text-kta-text hover:bg-kta-subtle"
-                                    to={`/posts/${post.id}/edit`}
-                                    onClick={handleStartEdit}
-                                >
-                                    수정
-                                </Link>
-                                <button
-                                    className="px-4 py-3 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
-                                    onClick={handleDelete}
-                                >
-                                    삭제
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                            {isMenuOpen && (
+                                <div className="absolute right-0 top-11 z-10 flex min-w-28 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
+                                    <Link
+                                        className="px-4 py-3 text-sm font-semibold text-kta-text hover:bg-kta-subtle"
+                                        to={`/posts/${post.id}/edit`}
+                                        onClick={handleStartEdit}
+                                    >
+                                        수정
+                                    </Link>
+                                    <button
+                                        className="px-4 py-3 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
+                                        onClick={handleDelete}
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <article className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
@@ -132,6 +137,7 @@ export default function PostDetailPage({
                     <div className="mt-5 border-t border-kta-border pt-5">
                         <CommentList
                             comments={comments}
+                            currentUserId={currentUserId}
                             onUpdateComment={onUpdateComment}
                             onDeleteComment={onDeleteComment}
                         />

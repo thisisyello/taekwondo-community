@@ -5,12 +5,14 @@ import { formatDate, isEdited } from "../utils/date";
 
 type CommentItemProps = {
     comment: Comment;
+    currentUserId: string;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
 };
 
 export default function CommentItem({
     comment,
+    currentUserId,
     onUpdateComment,
     onDeleteComment,
 }: CommentItemProps) {
@@ -19,6 +21,7 @@ export default function CommentItem({
     const [content, setContent] = useState(comment.content);
     const [hasSubmittedEdit, setHasSubmittedEdit] = useState(false);
     const contentError = hasSubmittedEdit && !content.trim();
+    const canManageComment = currentUserId === comment.author.id;
 
     const handleToggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -70,31 +73,33 @@ export default function CommentItem({
                     {isEdited(comment.createdAt, comment.updatedAt) &&
                         " (수정됨)"}
                 </p>
-                <div className="relative">
-                    <button
-                        className="rounded-full bg-kta-subtle px-3 py-1 text-xs font-bold text-kta-muted"
-                        onClick={handleToggleMenu}
-                    >
-                        <FiMoreVertical aria-hidden="true" />
-                    </button>
+                {canManageComment && (
+                    <div className="relative">
+                        <button
+                            className="rounded-full bg-kta-subtle px-3 py-1 text-xs font-bold text-kta-muted"
+                            onClick={handleToggleMenu}
+                        >
+                            <FiMoreVertical aria-hidden="true" />
+                        </button>
 
-                    {isMenuOpen && (
-                        <div className="absolute right-0 top-8 z-10 flex min-w-24 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
-                            <button
-                                className="px-3 py-2 text-left text-sm font-semibold text-kta-text hover:bg-kta-subtle"
-                                onClick={handleStartEdit}
-                            >
-                                수정
-                            </button>
-                            <button
-                                className="px-3 py-2 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
-                                onClick={handleDelete}
-                            >
-                                삭제
-                            </button>
-                        </div>
-                    )}
-                </div>
+                        {isMenuOpen && (
+                            <div className="absolute right-0 top-8 z-10 flex min-w-24 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
+                                <button
+                                    className="px-3 py-2 text-left text-sm font-semibold text-kta-text hover:bg-kta-subtle"
+                                    onClick={handleStartEdit}
+                                >
+                                    수정
+                                </button>
+                                <button
+                                    className="px-3 py-2 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
+                                    onClick={handleDelete}
+                                >
+                                    삭제
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {isEditing ? (
