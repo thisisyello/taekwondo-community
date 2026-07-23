@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router";
 import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
+import LoginPage from "./pages/LoginPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
 import SearchPage from "./pages/SearchPage";
+import SignupPage from "./pages/SignupPage";
 import {
     filterPostsByBoard,
     getCommentCountsByPostId,
@@ -19,15 +21,7 @@ import type {
     PostFormData,
     PostSortType,
 } from "./types/board";
-import type { CurrentUser } from "./types/user";
-
-const currentUser: CurrentUser = {
-    id: "user-current",
-    nickname: "현재회원",
-    role: "member",
-    createdAt: "2026-07-22T00:00:00.000Z",
-    updatedAt: "2026-07-22T00:00:00.000Z",
-};
+import type { CurrentUser, SignupFormData } from "./types/user";
 
 const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
     id: user.id,
@@ -35,6 +29,7 @@ const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
 });
 
 export default function App() {
+    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const [posts, setPosts] = useState<Post[]>(initialPosts);
     const [comments, setComments] = useState<Comment[]>(initialComments);
 
@@ -49,7 +44,43 @@ export default function App() {
         commentCountsByPostId,
     );
 
+    const handleLogin = (loginId: string) => {
+        const now = new Date().toISOString();
+
+        setCurrentUser({
+            id: `user-${Date.now()}`,
+            loginId,
+            name: loginId,
+            birthDate: "",
+            phoneNumber: "",
+            nickname: loginId,
+            role: "member",
+            createdAt: now,
+            updatedAt: now,
+        });
+    };
+
+    const handleSignup = (signupData: SignupFormData) => {
+        const now = new Date().toISOString();
+
+        setCurrentUser({
+            id: `user-${Date.now()}`,
+            loginId: signupData.loginId,
+            name: signupData.name,
+            birthDate: signupData.birthDate,
+            phoneNumber: signupData.phoneNumber,
+            nickname: signupData.nickname,
+            role: "member",
+            createdAt: now,
+            updatedAt: now,
+        });
+    };
+
     const handleCreatePost = (post: PostFormData) => {
+        if (!currentUser) {
+            throw new Error("로그인이 필요합니다.");
+        }
+
         const now = new Date().toISOString();
         const newPost: Post = {
             id: Date.now(),
@@ -106,6 +137,10 @@ export default function App() {
     };
 
     const handleAddComment = (postId: number, comment: CommentFormData) => {
+        if (!currentUser) {
+            throw new Error("로그인이 필요합니다.");
+        }
+
         const now = new Date().toISOString();
         const newComment: Comment = {
             id: Date.now(),
@@ -140,62 +175,108 @@ export default function App() {
     return (
         <Routes>
             <Route
+                path="/login"
+                element={
+                    currentUser ? (
+                        <Navigate to="/" replace />
+                    ) : (
+                        <LoginPage onLogin={handleLogin} />
+                    )
+                }
+            />
+            <Route
+                path="/signup"
+                element={
+                    currentUser ? (
+                        <Navigate to="/" replace />
+                    ) : (
+                        <SignupPage onSignup={handleSignup} />
+                    )
+                }
+            />
+            <Route
                 path="/"
                 element={
-                    <BoardPage
-                        posts={visiblePosts}
-                        commentCountsByPostId={commentCountsByPostId}
-                        postSortType={postSortType}
-                        onChangePostSortType={setPostSortType}
-                        selectedBoardType={selectedBoardType}
-                        onSelectBoardType={setSelectedBoardType}
-                    />
+                    currentUser ? (
+                        <BoardPage
+                            posts={visiblePosts}
+                            commentCountsByPostId={commentCountsByPostId}
+                            postSortType={postSortType}
+                            onChangePostSortType={setPostSortType}
+                            selectedBoardType={selectedBoardType}
+                            onSelectBoardType={setSelectedBoardType}
+                        />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
                 }
             />
             <Route
                 path="/search"
                 element={
-                    <SearchPage
-                        posts={posts}
-                        commentCountsByPostId={commentCountsByPostId}
-                    />
+                    currentUser ? (
+                        <SearchPage
+                            posts={posts}
+                            commentCountsByPostId={commentCountsByPostId}
+                        />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
                 }
             />
             <Route
                 path="/posts/new"
                 element={
-                    <PostEditorPage
-                        mode="create"
-                        onSubmitPost={handleCreatePost}
-                    />
+                    currentUser ? (
+                        <PostEditorPage
+                            mode="create"
+                            onSubmitPost={handleCreatePost}
+                        />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
                 }
             />
             <Route
                 path="/posts/:postId"
                 element={
-                    <PostDetailRoute
-                        posts={posts}
-                        comments={comments}
-                        currentUserId={currentUser.id}
-                        onAddComment={handleAddComment}
-                        onUpdateComment={handleUpdateComment}
-                        onDeleteComment={handleDeleteComment}
-                        onLikePost={handleLikePost}
-                        onViewPost={handleViewPost}
-                        onDeletePost={handleDeletePost}
-                    />
+                    currentUser ? (
+                        <PostDetailRoute
+                            posts={posts}
+                            comments={comments}
+                            currentUserId={currentUser.id}
+                            onAddComment={handleAddComment}
+                            onUpdateComment={handleUpdateComment}
+                            onDeleteComment={handleDeleteComment}
+                            onLikePost={handleLikePost}
+                            onViewPost={handleViewPost}
+                            onDeletePost={handleDeletePost}
+                        />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
                 }
             />
             <Route
                 path="/posts/:postId/edit"
                 element={
-                    <PostEditRoute
-                        posts={posts}
-                        onUpdatePost={handleUpdatePost}
-                    />
+                    currentUser ? (
+                        <PostEditRoute
+                            posts={posts}
+                            currentUserId={currentUser.id}
+                            onUpdatePost={handleUpdatePost}
+                        />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
                 }
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route
+                path="*"
+                element={
+                    <Navigate to={currentUser ? "/" : "/login"} replace />
+                }
+            />
         </Routes>
     );
 }
@@ -260,15 +341,24 @@ function PostDetailRoute({
 }
 
 type PostEditRouteProps = PostRouteProps & {
+    currentUserId: string;
     onUpdatePost: (id: number, post: PostFormData) => void;
 };
 
-function PostEditRoute({ posts, onUpdatePost }: PostEditRouteProps) {
+function PostEditRoute({
+    posts,
+    currentUserId,
+    onUpdatePost,
+}: PostEditRouteProps) {
     const { postId } = useParams();
     const post = posts.find((item) => item.id === Number(postId));
 
     if (!post) {
         return <Navigate to="/" replace />;
+    }
+
+    if (post.author.id !== currentUserId) {
+        return <Navigate to={`/posts/${post.id}`} replace />;
     }
 
     return (
