@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 type LoginPageProps = {
     onLogin: (loginId: string) => void;
@@ -87,6 +87,13 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                     >
                         로그인
                     </button>
+
+                    <Link
+                        className="self-center text-sm font-bold text-kta-navy"
+                        to="/signup"
+                    >
+                        계정이 없으신가요? 회원가입
+                    </Link>
                 </form>
             </div>
         </section>
