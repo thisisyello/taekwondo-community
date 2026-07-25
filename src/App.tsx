@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router";
+import AppLayout from "./components/AppLayout";
 import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
 import LoginPage from "./pages/LoginPage";
@@ -198,14 +199,19 @@ export default function App() {
                 path="/"
                 element={
                     currentUser ? (
-                        <BoardPage
-                            posts={visiblePosts}
-                            commentCountsByPostId={commentCountsByPostId}
-                            postSortType={postSortType}
-                            onChangePostSortType={setPostSortType}
-                            selectedBoardType={selectedBoardType}
-                            onSelectBoardType={setSelectedBoardType}
-                        />
+                        <AppLayout
+                            title="태권도 커뮤니티"
+                            showSearchButton
+                        >
+                            <BoardPage
+                                posts={visiblePosts}
+                                commentCountsByPostId={commentCountsByPostId}
+                                postSortType={postSortType}
+                                onChangePostSortType={setPostSortType}
+                                selectedBoardType={selectedBoardType}
+                                onSelectBoardType={setSelectedBoardType}
+                            />
+                        </AppLayout>
                     ) : (
                         <Navigate to="/login" replace />
                     )
@@ -215,10 +221,12 @@ export default function App() {
                 path="/search"
                 element={
                     currentUser ? (
-                        <SearchPage
-                            posts={posts}
-                            commentCountsByPostId={commentCountsByPostId}
-                        />
+                        <AppLayout title="검색" showBackButton>
+                            <SearchPage
+                                posts={posts}
+                                commentCountsByPostId={commentCountsByPostId}
+                            />
+                        </AppLayout>
                     ) : (
                         <Navigate to="/login" replace />
                     )
@@ -228,10 +236,12 @@ export default function App() {
                 path="/posts/new"
                 element={
                     currentUser ? (
-                        <PostEditorPage
-                            mode="create"
-                            onSubmitPost={handleCreatePost}
-                        />
+                        <AppLayout title="글쓰기" showBackButton>
+                            <PostEditorPage
+                                mode="create"
+                                onSubmitPost={handleCreatePost}
+                            />
+                        </AppLayout>
                     ) : (
                         <Navigate to="/login" replace />
                     )
@@ -241,17 +251,19 @@ export default function App() {
                 path="/posts/:postId"
                 element={
                     currentUser ? (
-                        <PostDetailRoute
-                            posts={posts}
-                            comments={comments}
-                            currentUserId={currentUser.id}
-                            onAddComment={handleAddComment}
-                            onUpdateComment={handleUpdateComment}
-                            onDeleteComment={handleDeleteComment}
-                            onLikePost={handleLikePost}
-                            onViewPost={handleViewPost}
-                            onDeletePost={handleDeletePost}
-                        />
+                        <AppLayout title="게시글" showBackButton>
+                            <PostDetailRoute
+                                posts={posts}
+                                comments={comments}
+                                currentUserId={currentUser.id}
+                                onAddComment={handleAddComment}
+                                onUpdateComment={handleUpdateComment}
+                                onDeleteComment={handleDeleteComment}
+                                onLikePost={handleLikePost}
+                                onViewPost={handleViewPost}
+                                onDeletePost={handleDeletePost}
+                            />
+                        </AppLayout>
                     ) : (
                         <Navigate to="/login" replace />
                     )
@@ -261,11 +273,13 @@ export default function App() {
                 path="/posts/:postId/edit"
                 element={
                     currentUser ? (
-                        <PostEditRoute
-                            posts={posts}
-                            currentUserId={currentUser.id}
-                            onUpdatePost={handleUpdatePost}
-                        />
+                        <AppLayout title="글 수정" showBackButton>
+                            <PostEditRoute
+                                posts={posts}
+                                currentUserId={currentUser.id}
+                                onUpdatePost={handleUpdatePost}
+                            />
+                        </AppLayout>
                     ) : (
                         <Navigate to="/login" replace />
                     )

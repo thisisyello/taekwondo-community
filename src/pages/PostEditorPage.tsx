@@ -63,35 +63,18 @@ export default function PostEditorPage(props: PostEditorPageProps) {
     };
 
     return (
-        <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
-            <div className="mx-auto max-w-3xl">
-                <header className="mb-4 rounded-kta-lg bg-kta-navy px-5 py-6 text-white shadow-kta-md">
-                    <p className="text-sm font-semibold text-white/75">
-                        {mode === "create" ? "새 게시글 작성" : "게시글 수정"}
-                    </p>
-                    <h1 className="mt-2 text-2xl font-black tracking-tight">
-                        {mode === "create" ? "글쓰기" : "글 수정"}
-                    </h1>
-                </header>
-
-                <div className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
-                    <PostForm
-                        mode={mode}
-                        title={form.title}
-                        content={form.content}
-                        board={form.board}
-                        onChangeTitle={(value) => updateForm("title", value)}
-                        onChangeContent={(value) =>
-                            updateForm("content", value)
-                        }
-                        onChangeBoard={(value: BoardType) =>
-                            updateForm("board", value)
-                        }
-                        onSubmit={handleSubmit}
-                        onCancel={() => navigate(-1)}
-                    />
-                </div>
-            </div>
-        </section>
+        <div className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
+            <PostForm
+                mode={mode}
+                title={form.title}
+                content={form.content}
+                board={form.board}
+                onChangeTitle={(value) => updateForm("title", value)}
+                onChangeContent={(value) => updateForm("content", value)}
+                onChangeBoard={(value: BoardType) => updateForm("board", value)}
+                onSubmit={handleSubmit}
+                onCancel={() => navigate(-1)}
+            />
+        </div>
     );
 }

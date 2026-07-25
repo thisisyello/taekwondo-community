@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router";
 import PostList from "../components/PostList";
 import type { Post, PostSortType, SearchTarget } from "../types/board";
 import { filterPostsBySearch, sortPosts } from "../utils/postList";
@@ -51,91 +50,81 @@ export default function SearchPage({
     };
 
     return (
-        <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
-            <div className="mx-auto flex max-w-3xl flex-col gap-4">
-                <div className="flex items-center justify-between">
-                    <Link className="text-sm font-bold text-kta-navy" to="/">
-                        목록으로
-                    </Link>
-                    <h1 className="text-lg font-black text-kta-text">검색</h1>
-                    <div className="w-12" />
-                </div>
-
-                <form
-                    className="grid gap-2 rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm sm:grid-cols-[120px_1fr_88px]"
-                    onSubmit={handleSubmit}
+        <>
+            <form
+                className="grid gap-2 rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm sm:grid-cols-[120px_1fr_88px]"
+                onSubmit={handleSubmit}
+            >
+                <select
+                    className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none focus:border-kta-navy"
+                    value={searchTarget}
+                    onChange={(event) =>
+                        setSearchTarget(event.target.value as SearchTarget)
+                    }
                 >
-                    <select
-                        className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none focus:border-kta-navy"
-                        value={searchTarget}
-                        onChange={(event) =>
-                            setSearchTarget(event.target.value as SearchTarget)
-                        }
-                    >
-                        <option value="all">전체</option>
-                        <option value="title">제목</option>
-                        <option value="content">내용</option>
-                        <option value="author">작성자</option>
-                    </select>
-                    <input
-                        autoFocus
-                        className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none placeholder:text-kta-muted focus:border-kta-navy"
-                        placeholder="검색어를 입력하세요"
-                        value={inputKeyword}
-                        onChange={(event) => setInputKeyword(event.target.value)}
-                    />
-                    <button
-                        className="h-11 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
-                        type="submit"
-                    >
-                        검색
-                    </button>
-                </form>
+                    <option value="all">전체</option>
+                    <option value="title">제목</option>
+                    <option value="content">내용</option>
+                    <option value="author">작성자</option>
+                </select>
+                <input
+                    autoFocus
+                    className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none placeholder:text-kta-muted focus:border-kta-navy"
+                    placeholder="검색어를 입력하세요"
+                    value={inputKeyword}
+                    onChange={(event) => setInputKeyword(event.target.value)}
+                />
+                <button
+                    className="h-11 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
+                    type="submit"
+                >
+                    검색
+                </button>
+            </form>
 
-                {hasSubmittedKeyword ? (
-                    <section className="flex flex-col gap-3">
-                        <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
-                            <p className="text-sm font-bold text-kta-text">
-                                {searchTargetLabel}에서 "{submittedKeyword}" 검색
-                                결과 {sortedSearchResults.length}건
-                            </p>
-                        </div>
-                        <PostList
-                            posts={sortedSearchResults}
-                            commentCountsByPostId={commentCountsByPostId}
-                            postSortType={postSortType}
-                            onChangePostSortType={setPostSortType}
-                            emptyMessage="검색 결과가 없습니다."
-                        />
-                    </section>
-                ) : (
-                    <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
-                        <h2 className="text-base font-black text-kta-navy">
-                            최근 검색어
-                        </h2>
-                        {recentKeywords.length === 0 ? (
-                            <p className="mt-3 text-sm text-kta-muted">
-                                아직 검색어가 없습니다.
-                            </p>
-                        ) : (
-                            <ul className="mt-3 flex flex-wrap gap-2">
-                                {recentKeywords.map((keyword) => (
-                                    <li key={keyword}>
-                                        <button
-                                            className="rounded-full bg-kta-subtle px-3 py-2 text-sm font-bold text-kta-muted"
-                                            onClick={() => submitKeyword(keyword)}
-                                            type="button"
-                                        >
-                                            {keyword}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </section>
-                )}
-            </div>
-        </section>
+            {hasSubmittedKeyword ? (
+                <section className="flex flex-col gap-3">
+                    <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
+                        <p className="text-sm font-bold text-kta-text">
+                            {searchTargetLabel}에서 "{submittedKeyword}" 검색
+                            결과 {sortedSearchResults.length}건
+                        </p>
+                    </div>
+                    <PostList
+                        posts={sortedSearchResults}
+                        commentCountsByPostId={commentCountsByPostId}
+                        postSortType={postSortType}
+                        onChangePostSortType={setPostSortType}
+                        emptyMessage="검색 결과가 없습니다."
+                    />
+                </section>
+            ) : (
+                <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
+                    <h2 className="text-base font-black text-kta-navy">
+                        최근 검색어
+                    </h2>
+                    {recentKeywords.length === 0 ? (
+                        <p className="mt-3 text-sm text-kta-muted">
+                            아직 검색어가 없습니다.
+                        </p>
+                    ) : (
+                        <ul className="mt-3 flex flex-wrap gap-2">
+                            {recentKeywords.map((keyword) => (
+                                <li key={keyword}>
+                                    <button
+                                        className="rounded-full bg-kta-subtle px-3 py-2 text-sm font-bold text-kta-muted"
+                                        onClick={() => submitKeyword(keyword)}
+                                        type="button"
+                                    >
+                                        {keyword}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </section>
+            )}
+        </>
     );
 }
 
