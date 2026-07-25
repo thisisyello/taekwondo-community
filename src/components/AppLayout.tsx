@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import BottomNav from "./BottomNav";
 import TopBar from "./TopBar";
 
 type AppLayoutProps = {
@@ -24,6 +25,7 @@ export default function AppLayout({
             <main className="mx-auto flex max-w-3xl flex-col gap-4 px-4 pb-24 pt-4">
                 {children}
             </main>
+            <BottomNav />
         </section>
     );
 }

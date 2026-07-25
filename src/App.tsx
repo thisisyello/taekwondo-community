@@ -3,7 +3,10 @@ import { Navigate, Route, Routes, useParams } from "react-router";
 import AppLayout from "./components/AppLayout";
 import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
+import ChatsPage from "./pages/ChatsPage";
+import DojangPage from "./pages/DojangPage";
 import LoginPage from "./pages/LoginPage";
+import MyPage from "./pages/MyPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
 import SearchPage from "./pages/SearchPage";
@@ -75,6 +78,10 @@ export default function App() {
             createdAt: now,
             updatedAt: now,
         });
+    };
+
+    const handleLogout = () => {
+        setCurrentUser(null);
     };
 
     const handleCreatePost = (post: PostFormData) => {
@@ -225,6 +232,45 @@ export default function App() {
                             <SearchPage
                                 posts={posts}
                                 commentCountsByPostId={commentCountsByPostId}
+                            />
+                        </AppLayout>
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
+                }
+            />
+            <Route
+                path="/dojang"
+                element={
+                    currentUser ? (
+                        <AppLayout title="도장" showBackButton>
+                            <DojangPage />
+                        </AppLayout>
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
+                }
+            />
+            <Route
+                path="/chats"
+                element={
+                    currentUser ? (
+                        <AppLayout title="채팅" showBackButton>
+                            <ChatsPage />
+                        </AppLayout>
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
+                }
+            />
+            <Route
+                path="/me"
+                element={
+                    currentUser ? (
+                        <AppLayout title="내정보" showBackButton>
+                            <MyPage
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
                             />
                         </AppLayout>
                     ) : (
