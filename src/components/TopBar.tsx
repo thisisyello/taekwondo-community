@@ -34,7 +34,7 @@ export default function TopBar({
                 {showSearchButton ? (
                     <Link
                         aria-label="검색"
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-kta-navy text-white"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-kta-navy"
                         to="/search"
                     >
                         <FiSearch aria-hidden="true" />
