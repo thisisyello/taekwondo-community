@@ -22,7 +22,7 @@ export default function BoardPage({
     onSelectBoardType,
 }: BoardPageProps) {
     return (
-        <>
+        <div>
             <div className="rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm">
                 <BoardFilter
                     selectedBoardType={selectedBoardType}
@@ -44,6 +44,6 @@ export default function BoardPage({
                 <FiEdit3 aria-hidden="true" />
                 글쓰기
             </Link>
-        </>
+        </div>
     );
 }

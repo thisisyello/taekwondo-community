@@ -42,11 +42,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                     <div className="flex flex-col gap-1">
                         <input
                             autoFocus
-                            className={
-                                loginIdError
-                                    ? "h-12 rounded-kta-md border border-kta-red px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-red"
-                                    : "h-12 rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy"
-                            }
+                            className={getInputClassName(loginIdError)}
                             placeholder="아이디"
                             value={loginId}
                             onChange={(event) =>
@@ -62,11 +58,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
                     <div className="flex flex-col gap-1">
                         <input
-                            className={
-                                passwordError
-                                    ? "h-12 rounded-kta-md border border-kta-red px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-red"
-                                    : "h-12 rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy"
-                            }
+                            className={getInputClassName(passwordError)}
                             placeholder="비밀번호"
                             type="password"
                             value={password}
@@ -99,3 +91,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         </section>
     );
 }
+
+const getInputClassName = (hasError: boolean) => {
+    return hasError
+        ? "h-12 w-full rounded-kta-md border border-kta-red px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-red"
+        : "h-12 w-full rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy";
+};
