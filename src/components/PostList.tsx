@@ -26,7 +26,7 @@ export default function PostList({
     );
 
     return (
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-3 pt-3">
             <div className="flex justify-end">
                 <select
                     className="h-9 rounded-full border border-kta-border bg-kta-surface px-3 text-xs font-bold text-kta-muted outline-none focus:border-kta-navy"
