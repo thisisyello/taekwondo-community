@@ -15,9 +15,11 @@ export default function BoardFilter({
             {BOARD_FILTER_OPTIONS.map((option) => (
                 <button
                     className={
-                        selectedBoardType === option.type
-                            ? "shrink-0 rounded-full bg-kta-navy px-4 py-2 text-sm font-bold text-white"
-                            : "shrink-0 rounded-full bg-kta-subtle px-4 py-2 text-sm font-semibold text-kta-muted"
+                        `shrink-0 rounded-full px-4 py-2 text-sm ${
+                            selectedBoardType === option.type
+                                ? "bg-kta-navy font-bold text-white"
+                                : "bg-kta-subtle font-semibold text-kta-muted"
+                        }`
                     }
                     key={option.type}
                     onClick={() => onSelectBoardType(option.type)}
