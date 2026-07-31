@@ -34,10 +34,6 @@ export default function PostForm({
 
     setHasSubmitted(true);
 
-    if (titleError || contentError) {
-      return;
-    }
-
     if (!title.trim() || !content.trim()) {
       return;
     }
