@@ -5,7 +5,7 @@ import { formatDate, isEdited } from "../utils/date";
 
 type CommentItemProps = {
     comment: Comment;
-    currentUserId: string;
+    currentUserId: string | null;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
 };

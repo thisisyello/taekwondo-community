@@ -3,7 +3,7 @@ import CommentItem from "./CommentItem";
 
 type CommentListProps = {
     comments: Comment[];
-    currentUserId: string;
+    currentUserId: string | null;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
 };

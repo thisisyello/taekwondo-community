@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+.login-notice-toast {
+  animation: login-notice-slide 3.6s ease-in-out both;
+}
+
+@keyframes login-notice-slide {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(calc(100% + 1.5rem));
+  }
+
+  8.333%,
+  91.667% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-notice-toast {
+    animation-name: login-notice-fade;
+  }
+}
+
+@keyframes login-notice-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  8.333%,
+  91.667% {
+    opacity: 1;
+  }
+}
+
 @theme {
   --color-kta-navy: #070d61;
   --color-kta-red: #ff1f1f;

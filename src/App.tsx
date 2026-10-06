@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, Route, Routes, useParams } from "react-router";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router";
 import AppLayout from "./components/AppLayout";
 import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/BoardPage";
@@ -33,9 +33,15 @@ const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
 });
 
 export default function App() {
+    const location = useLocation();
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const [posts, setPosts] = useState<Post[]>(initialPosts);
     const [comments, setComments] = useState<Comment[]>(initialComments);
+    const requestedPath: unknown = location.state?.from;
+    const returnTo = typeof requestedPath === "string" && (
+        ["/dojang", "/chats", "/me"].includes(requestedPath) ||
+        posts.some((post) => requestedPath === `/posts/${post.id}`)
+    ) ? requestedPath : "/";
 
     const [selectedBoardType, setSelectedBoardType] =
         useState<BoardFilterType>("all");
@@ -186,9 +192,13 @@ export default function App() {
                 path="/login"
                 element={
                     currentUser ? (
-                        <Navigate to="/" replace />
+                        <Navigate to={returnTo} replace />
                     ) : (
-                        <LoginPage onLogin={handleLogin} />
+                        <LoginPage
+                            onLogin={handleLogin}
+                            returnTo={returnTo}
+                            showLoginNotice={location.state?.showLoginNotice === true}
+                        />
                     )
                 }
             />
@@ -205,7 +215,6 @@ export default function App() {
             <Route
                 path="/"
                 element={
-                    currentUser ? (
                         <AppLayout
                             title="태권도 커뮤니티"
                             showSearchButton
@@ -219,24 +228,17 @@ export default function App() {
                                 onSelectBoardType={setSelectedBoardType}
                             />
                         </AppLayout>
-                    ) : (
-                        <Navigate to="/login" replace />
-                    )
                 }
             />
             <Route
                 path="/search"
                 element={
-                    currentUser ? (
                         <AppLayout title="검색" showBackButton>
                             <SearchPage
                                 posts={posts}
                                 commentCountsByPostId={commentCountsByPostId}
                             />
                         </AppLayout>
-                    ) : (
-                        <Navigate to="/login" replace />
-                    )
                 }
             />
             <Route
@@ -247,7 +249,7 @@ export default function App() {
                             <DojangPage />
                         </AppLayout>
                     ) : (
-                        <Navigate to="/login" replace />
+                        <LoginRequiredRedirect />
                     )
                 }
             />
@@ -259,7 +261,7 @@ export default function App() {
                             <ChatsPage />
                         </AppLayout>
                     ) : (
-                        <Navigate to="/login" replace />
+                        <LoginRequiredRedirect />
                     )
                 }
             />
@@ -274,7 +276,7 @@ export default function App() {
                             />
                         </AppLayout>
                     ) : (
-                        <Navigate to="/login" replace />
+                        <LoginRequiredRedirect />
                     )
                 }
             />
@@ -296,12 +298,11 @@ export default function App() {
             <Route
                 path="/posts/:postId"
                 element={
-                    currentUser ? (
                         <AppLayout title="게시글" showBackButton>
                             <PostDetailRoute
                                 posts={posts}
                                 comments={comments}
-                                currentUserId={currentUser.id}
+                                currentUserId={currentUser?.id ?? null}
                                 onAddComment={handleAddComment}
                                 onUpdateComment={handleUpdateComment}
                                 onDeleteComment={handleDeleteComment}
@@ -310,9 +311,6 @@ export default function App() {
                                 onDeletePost={handleDeletePost}
                             />
                         </AppLayout>
-                    ) : (
-                        <Navigate to="/login" replace />
-                    )
                 }
             />
             <Route
@@ -334,10 +332,22 @@ export default function App() {
             <Route
                 path="*"
                 element={
-                    <Navigate to={currentUser ? "/" : "/login"} replace />
+                    <Navigate to="/" replace />
                 }
             />
         </Routes>
+    );
+}
+
+function LoginRequiredRedirect() {
+    const location = useLocation();
+
+    return (
+        <Navigate
+            to="/login"
+            replace
+            state={{ from: location.pathname, showLoginNotice: true }}
+        />
     );
 }
 
@@ -347,7 +357,7 @@ type PostRouteProps = {
 
 type PostDetailRouteProps = PostRouteProps & {
     comments: Comment[];
-    currentUserId: string;
+    currentUserId: string | null;
     onAddComment: (postId: number, comment: CommentFormData) => void;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;

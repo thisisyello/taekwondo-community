@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiEye, FiHeart, FiMoreVertical } from "react-icons/fi";
+import { FiEye, FiHeart, FiLogIn, FiMoreVertical } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
@@ -10,7 +10,7 @@ import { formatDate, isEdited } from "../utils/date";
 type PostDetailPageProps = {
     post: Post;
     comments: Comment[];
-    currentUserId: string;
+    currentUserId: string | null;
     onAddComment: (postId: number, comment: CommentFormData) => void;
     onUpdateComment: (id: number, content: string) => void;
     onDeleteComment: (id: number) => void;
@@ -102,7 +102,18 @@ export default function PostDetailPage({
                 </p>
                 <button
                     className="mt-6 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-kta-red"
-                    onClick={() => onLikePost(post.id)}
+                    onClick={() => {
+                        if (!currentUserId) {
+                            navigate("/login", {
+                                state: {
+                                    from: `/posts/${post.id}`,
+                                    showLoginNotice: true,
+                                },
+                            });
+                            return;
+                        }
+                        onLikePost(post.id);
+                    }}
                 >
                     <FiHeart aria-hidden="true" className="inline" /> 공감{" "}
                     {post.likeCount}
@@ -114,11 +125,21 @@ export default function PostDetailPage({
                     댓글 {comments.length}
                 </h2>
                 <div className="mt-4">
-                    <CommentForm
-                        onAddComment={(comment) =>
-                            onAddComment(post.id, comment)
-                        }
-                    />
+                    {currentUserId ? (
+                        <CommentForm
+                            onAddComment={(comment) =>
+                                onAddComment(post.id, comment)
+                            }
+                        />
+                    ) : (
+                        <Link
+                            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-kta-md border border-kta-border bg-kta-subtle px-4 py-3 text-sm font-semibold text-kta-navy transition-colors hover:border-kta-navy hover:bg-kta-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kta-navy"
+                            to="/login"
+                        >
+                            <FiLogIn aria-hidden="true" className="shrink-0 text-lg" />
+                            <span>로그인하고 댓글 작성하기</span>
+                        </Link>
+                    )}
                 </div>
                 <div className="mt-5 border-t border-kta-border pt-5">
                     <CommentList
