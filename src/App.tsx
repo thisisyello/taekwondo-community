@@ -11,6 +11,7 @@ import PostDetailPage from "./pages/PostDetailPage";
 import PostEditorPage from "./pages/PostEditorPage";
 import SearchPage from "./pages/SearchPage";
 import SignupPage from "./pages/SignupPage";
+import { useToast } from "./hooks/useToast";
 import {
     filterPostsByBoard,
     getCommentCountsByPostId,
@@ -197,7 +198,6 @@ export default function App() {
                         <LoginPage
                             onLogin={handleLogin}
                             returnTo={returnTo}
-                            showLoginNotice={location.state?.showLoginNotice === true}
                         />
                     )
                 }
@@ -341,12 +341,17 @@ export default function App() {
 
 function LoginRequiredRedirect() {
     const location = useLocation();
+    const showToast = useToast();
+
+    useEffect(() => {
+        showToast("로그인이 필요한 서비스입니다.");
+    }, [showToast]);
 
     return (
         <Navigate
             to="/login"
             replace
-            state={{ from: location.pathname, showLoginNotice: true }}
+            state={{ from: location.pathname }}
         />
     );
 }

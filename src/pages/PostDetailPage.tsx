@@ -3,6 +3,7 @@ import { FiEye, FiHeart, FiLogIn, FiMoreVertical } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
+import { useToast } from "../hooks/useToast";
 import { BOARD_LABELS } from "../types/board";
 import type { Comment, CommentFormData, Post } from "../types/board";
 import { formatDate, isEdited } from "../utils/date";
@@ -29,6 +30,7 @@ export default function PostDetailPage({
     onDeletePost,
 }: PostDetailPageProps) {
     const navigate = useNavigate();
+    const showToast = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const canManagePost = currentUserId === post.author.id;
 
@@ -104,10 +106,10 @@ export default function PostDetailPage({
                     className="mt-6 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-kta-red"
                     onClick={() => {
                         if (!currentUserId) {
+                            showToast("로그인이 필요한 서비스입니다.");
                             navigate("/login", {
                                 state: {
                                     from: `/posts/${post.id}`,
-                                    showLoginNotice: true,
                                 },
                             });
                             return;

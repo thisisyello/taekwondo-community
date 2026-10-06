@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-.login-notice-toast {
-  animation: login-notice-slide 3.6s ease-in-out both;
+.app-toast {
+  animation: toast-slide 3.6s ease-in-out both;
 }
 
-@keyframes login-notice-slide {
+@keyframes toast-slide {
   0%,
   100% {
     opacity: 0;
@@ -19,12 +19,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-notice-toast {
-    animation-name: login-notice-fade;
+  .app-toast {
+    animation-name: toast-fade;
   }
 }
 
-@keyframes login-notice-fade {
+@keyframes toast-fade {
   0%,
   100% {
     opacity: 0;

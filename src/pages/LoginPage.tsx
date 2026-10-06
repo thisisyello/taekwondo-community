@@ -1,27 +1,18 @@
-import { useEffect, useState } from "react";
-import { FiInfo } from "react-icons/fi";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 type LoginPageProps = {
     onLogin: (loginId: string) => void;
     returnTo: string;
-    showLoginNotice: boolean;
 };
 
-export default function LoginPage({ onLogin, returnTo, showLoginNotice }: LoginPageProps) {
+export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
     const navigate = useNavigate();
-    const [isToastVisible, setIsToastVisible] = useState(showLoginNotice);
     const [loginId, setLoginId] = useState("");
     const [password, setPassword] = useState("");
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const loginIdError = hasSubmitted && !loginId.trim();
     const passwordError = hasSubmitted && !password.trim();
-
-    useEffect(() => {
-        if (!isToastVisible) return;
-
-        navigate("/login", { replace: true, state: { from: returnTo } });
-    }, [isToastVisible, navigate, returnTo]);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -35,22 +26,6 @@ export default function LoginPage({ onLogin, returnTo, showLoginNotice }: LoginP
 
     return (
         <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
-            <div
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-                className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
-            >
-                {isToastVisible && (
-                    <div
-                        className="login-notice-toast flex max-w-md items-center gap-2 rounded-kta-md bg-kta-text px-4 py-3 text-sm font-semibold text-white shadow-kta-md"
-                        onAnimationEnd={() => setIsToastVisible(false)}
-                    >
-                        <FiInfo aria-hidden="true" className="shrink-0 text-lg" />
-                        <span>로그인이 필요한 서비스입니다.</span>
-                    </div>
-                )}
-            </div>
             <div className="mx-auto flex min-h-[calc(100svh-40px)] max-w-md flex-col justify-center">
                 <div className="rounded-kta-lg bg-kta-navy px-5 py-6 text-white shadow-kta-md">
                     <p className="text-sm font-semibold text-white/75">
