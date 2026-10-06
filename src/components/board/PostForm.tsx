@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { BOARD_OPTIONS } from "../types/board";
-import type { BoardType } from "../types/board";
+import { BOARD_OPTIONS } from "../../types/board";
+import type { BoardType } from "../../types/board";
 
 type PostFormProps = {
   mode: "create" | "edit";

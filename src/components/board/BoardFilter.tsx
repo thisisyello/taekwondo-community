@@ -1,5 +1,5 @@
-import { BOARD_FILTER_OPTIONS } from "../types/board";
-import type { BoardFilterType } from "../types/board";
+import { BOARD_FILTER_OPTIONS } from "../../types/board";
+import type { BoardFilterType } from "../../types/board";
 
 type BoardFilterProps = {
     selectedBoardType: BoardFilterType;

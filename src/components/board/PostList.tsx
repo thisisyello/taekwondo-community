@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Post } from "../types/board";
-import type { PostSortType } from "../types/board";
+import type { Post } from "../../types/board";
+import type { PostSortType } from "../../types/board";
 import PostItem from "./PostItem";
 
 const POSTS_PER_LOAD = 5;

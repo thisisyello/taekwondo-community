@@ -1,7 +1,7 @@
 import { useState } from "react";
-import PostList from "../components/PostList";
-import type { Post, PostSortType, SearchTarget } from "../types/board";
-import { filterPostsBySearch, sortPosts } from "../utils/postList";
+import PostList from "../../components/board/PostList";
+import type { Post, PostSortType, SearchTarget } from "../../types/board";
+import { filterPostsBySearch, sortPosts } from "../../utils/postList";
 
 type SearchPageProps = {
     posts: Post[];

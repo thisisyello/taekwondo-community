@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import PostForm from "../components/PostForm";
-import type { BoardType, Post, PostFormData } from "../types/board";
+import PostForm from "../../components/board/PostForm";
+import type { BoardType, Post, PostFormData } from "../../types/board";
 
 type PostEditorPageProps =
     | {

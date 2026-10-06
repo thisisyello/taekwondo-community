@@ -1,8 +1,8 @@
 import { FiEye, FiHeart, FiMessageCircle } from "react-icons/fi";
 import { Link } from "react-router";
-import { BOARD_LABELS } from "../types/board";
-import type { Post } from "../types/board";
-import { formatDate, isEdited } from "../utils/date";
+import { BOARD_LABELS } from "../../types/board";
+import type { Post } from "../../types/board";
+import { formatDate, isEdited } from "../../utils/date";
 
 type PostItemProps = {
     post: Post;

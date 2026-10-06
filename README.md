@@ -50,17 +50,23 @@ npm run preview
 ## Project Structure
 
 - `src/App.tsx`: 전체 상태 관리, 라우팅, 게시글/댓글 이벤트 처리
-- `src/pages/BoardPage.tsx`: 게시글 목록 화면
-- `src/pages/SearchPage.tsx`: 게시글 검색 화면
-- `src/pages/PostDetailPage.tsx`: 게시글 상세와 댓글 화면
-- `src/pages/PostEditorPage.tsx`: 게시글 작성/수정 화면
-- `src/components/BoardFilter.tsx`: 게시판 필터 버튼
-- `src/components/PostList.tsx`: 게시글 목록, 정렬, 스크롤 더보기
-- `src/components/PostItem.tsx`: 게시글 목록 아이템
-- `src/components/PostForm.tsx`: 게시글 작성/수정 폼
-- `src/components/CommentForm.tsx`: 댓글 작성 폼
-- `src/components/CommentList.tsx`: 댓글 목록
-- `src/components/CommentItem.tsx`: 댓글 아이템과 수정/삭제 메뉴
+- `src/pages/auth/`: 로그인과 회원가입 화면
+- `src/pages/board/BoardPage.tsx`: 게시글 목록 화면
+- `src/pages/board/SearchPage.tsx`: 게시글 검색 화면
+- `src/pages/board/PostDetailPage.tsx`: 게시글 상세와 댓글 화면
+- `src/pages/board/PostEditorPage.tsx`: 게시글 작성/수정 화면
+- `src/pages/dojang/`: 도장 화면
+- `src/pages/chat/`: 채팅 화면
+- `src/pages/account/`: 내정보 화면
+- `src/components/layout/`: 공통 레이아웃, 상단바, 하단바
+- `src/components/common/`: 전역 토스트 등 공통 컴포넌트
+- `src/components/board/BoardFilter.tsx`: 게시판 필터 버튼
+- `src/components/board/PostList.tsx`: 게시글 목록, 정렬, 스크롤 더보기
+- `src/components/board/PostItem.tsx`: 게시글 목록 아이템
+- `src/components/board/PostForm.tsx`: 게시글 작성/수정 폼
+- `src/components/board/CommentForm.tsx`: 댓글 작성 폼
+- `src/components/board/CommentList.tsx`: 댓글 목록
+- `src/components/board/CommentItem.tsx`: 댓글 아이템과 수정/삭제 메뉴
 - `src/data/initialBoardData.ts`: 초기 게시글/댓글 데이터
 - `src/types/board.ts`: 게시판, 게시글, 댓글, 검색, 정렬 타입
 - `src/utils/postList.ts`: 게시글 필터링, 검색, 정렬, 댓글 수 계산

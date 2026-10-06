@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
-import type { SignupFormData } from "../types/user";
+import type { SignupFormData } from "../../types/user";
 
 type SignupPageProps = {
     onSignup: (signupData: SignupFormData) => void;

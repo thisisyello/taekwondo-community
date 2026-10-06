@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { FiEye, FiHeart, FiLogIn, FiMoreVertical } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
-import CommentForm from "../components/CommentForm";
-import CommentList from "../components/CommentList";
-import { useToast } from "../hooks/useToast";
-import { BOARD_LABELS } from "../types/board";
-import type { Comment, CommentFormData, Post } from "../types/board";
-import { formatDate, isEdited } from "../utils/date";
+import CommentForm from "../../components/board/CommentForm";
+import CommentList from "../../components/board/CommentList";
+import { useToast } from "../../hooks/useToast";
+import { BOARD_LABELS } from "../../types/board";
+import type { Comment, CommentFormData, Post } from "../../types/board";
+import { formatDate, isEdited } from "../../utils/date";
 
 type PostDetailPageProps = {
     post: Post;

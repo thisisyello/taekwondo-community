@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiMoreVertical } from "react-icons/fi";
-import type { Comment } from "../types/board";
-import { formatDate, isEdited } from "../utils/date";
+import type { Comment } from "../../types/board";
+import { formatDate, isEdited } from "../../utils/date";
 
 type CommentItemProps = {
     comment: Comment;

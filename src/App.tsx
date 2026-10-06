@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useParams } from "react-router";
-import AppLayout from "./components/AppLayout";
+import AppLayout from "./components/layout/AppLayout";
 import { initialComments, initialPosts } from "./data/initialBoardData";
-import BoardPage from "./pages/BoardPage";
-import ChatsPage from "./pages/ChatsPage";
-import DojangPage from "./pages/DojangPage";
-import LoginPage from "./pages/LoginPage";
-import MyPage from "./pages/MyPage";
-import PostDetailPage from "./pages/PostDetailPage";
-import PostEditorPage from "./pages/PostEditorPage";
-import SearchPage from "./pages/SearchPage";
-import SignupPage from "./pages/SignupPage";
+import BoardPage from "./pages/board/BoardPage";
+import ChatsPage from "./pages/chat/ChatsPage";
+import DojangPage from "./pages/dojang/DojangPage";
+import LoginPage from "./pages/auth/LoginPage";
+import MyPage from "./pages/account/MyPage";
+import PostDetailPage from "./pages/board/PostDetailPage";
+import PostEditorPage from "./pages/board/PostEditorPage";
+import SearchPage from "./pages/board/SearchPage";
+import SignupPage from "./pages/auth/SignupPage";
 import { useToast } from "./hooks/useToast";
 import {
     filterPostsByBoard,

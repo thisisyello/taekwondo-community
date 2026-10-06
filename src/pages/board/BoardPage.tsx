@@ -1,8 +1,8 @@
 import { FiEdit3 } from "react-icons/fi";
 import { Link } from "react-router";
-import BoardFilter from "../components/BoardFilter";
-import PostList from "../components/PostList";
-import type { BoardFilterType, Post, PostSortType } from "../types/board";
+import BoardFilter from "../../components/board/BoardFilter";
+import PostList from "../../components/board/PostList";
+import type { BoardFilterType, Post, PostSortType } from "../../types/board";
 
 type BoardPageProps = {
     posts: Post[];

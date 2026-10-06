@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
-import type { CurrentUser } from "../types/user";
-import { formatDate } from "../utils/date";
+import type { CurrentUser } from "../../types/user";
+import { formatDate } from "../../utils/date";
 
 type MyPageProps = {
     currentUser: CurrentUser;

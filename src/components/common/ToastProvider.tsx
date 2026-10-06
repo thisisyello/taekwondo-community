@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { FiInfo } from "react-icons/fi";
-import { ToastContext } from "../hooks/useToast";
+import { ToastContext } from "../../hooks/useToast";
 
 type Toast = {
     id: number;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CommentFormData } from "../types/board";
+import type { CommentFormData } from "../../types/board";
 
 type CommentFormProps = {
     onAddComment: (comment: CommentFormData) => void;
