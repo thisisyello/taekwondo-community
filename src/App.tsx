@@ -5,6 +5,7 @@ import { initialComments, initialPosts } from "./data/initialBoardData";
 import BoardPage from "./pages/board/BoardPage";
 import ChatsPage from "./pages/chat/ChatsPage";
 import DojangPage from "./pages/dojang/DojangPage";
+import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/LoginPage";
 import MyPage from "./pages/account/MyPage";
 import PostDetailPage from "./pages/board/PostDetailPage";
@@ -40,7 +41,7 @@ export default function App() {
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const requestedPath: unknown = location.state?.from;
     const returnTo = typeof requestedPath === "string" && (
-        ["/dojang", "/chats", "/me"].includes(requestedPath) ||
+        ["/dojang", "/home", "/chats", "/me"].includes(requestedPath) ||
         posts.some((post) => requestedPath === `/posts/${post.id}`)
     ) ? requestedPath : "/";
 
@@ -244,13 +245,17 @@ export default function App() {
             <Route
                 path="/dojang"
                 element={
-                    currentUser ? (
-                        <AppLayout title="도장" showBackButton>
-                            <DojangPage />
-                        </AppLayout>
-                    ) : (
-                        <LoginRequiredRedirect />
-                    )
+                    <AppLayout title="찾기">
+                        <DojangPage />
+                    </AppLayout>
+                }
+            />
+            <Route
+                path="/home"
+                element={
+                    <AppLayout title="홈">
+                        <HomePage isLoggedIn={currentUser !== null} />
+                    </AppLayout>
                 }
             />
             <Route
