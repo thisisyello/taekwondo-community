@@ -3,6 +3,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import type { SignupFormData, SignupResult } from "../../types/user";
 import { getSignupErrors } from "../../utils/authValidation";
+import { formatMobilePhoneNumber } from "../../utils/phone";
 
 type SignupPageProps = {
     onSignup: (signupData: SignupFormData) => Promise<SignupResult>;
@@ -101,11 +102,14 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </legend>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-name" className="text-xs font-semibold text-kta-text">
+                                이름
+                            </label>
                             <input
+                                id="signup-name"
                                 autoFocus
                                 className={getInputClassName(nameError)}
-                                placeholder="이름"
-                                aria-label="이름"
+                                placeholder="이름을 입력해주세요"
                                 autoComplete="name"
                                 maxLength={80}
                                 value={name}
@@ -121,10 +125,13 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </div>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-birth-date" className="text-xs font-semibold text-kta-text">
+                                생년월일
+                            </label>
                             <input
+                                id="signup-birth-date"
                                 className={getInputClassName(birthDateError)}
                                 type="date"
-                                aria-label="생년월일"
                                 autoComplete="bday"
                                 value={birthDate}
                                 onChange={(event) =>
@@ -139,16 +146,19 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </div>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-phone" className="text-xs font-semibold text-kta-text">
+                                휴대전화 번호
+                            </label>
                             <input
+                                id="signup-phone"
                                 className={getInputClassName(phoneNumberError)}
                                 inputMode="tel"
                                 type="tel"
-                                aria-label="전화번호"
                                 autoComplete="tel"
-                                placeholder="전화번호"
+                                placeholder="01012345678"
                                 value={phoneNumber}
                                 onChange={(event) =>
-                                    setPhoneNumber(event.target.value)
+                                    setPhoneNumber(formatMobilePhoneNumber(event.target.value))
                                 }
                             />
                             {phoneNumberError && (
@@ -165,10 +175,13 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </legend>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-email" className="text-xs font-semibold text-kta-text">
+                                이메일
+                            </label>
                             <input
+                                id="signup-email"
                                 className={getInputClassName(emailError)}
-                                placeholder="이메일"
-                                aria-label="이메일"
+                                placeholder="example@email.com"
                                 type="email"
                                 autoComplete="email"
                                 value={email}
@@ -182,10 +195,13 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </div>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-nickname" className="text-xs font-semibold text-kta-text">
+                                공용 닉네임
+                            </label>
                             <input
+                                id="signup-nickname"
                                 className={getInputClassName(nicknameError)}
-                                placeholder="공용 닉네임"
-                                aria-label="공용 닉네임"
+                                placeholder="공용 닉네임을 입력해주세요"
                                 autoComplete="nickname"
                                 maxLength={30}
                                 value={nickname}
@@ -201,11 +217,14 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </div>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-password" className="text-xs font-semibold text-kta-text">
+                                비밀번호
+                            </label>
                             <div className="relative">
                                 <input
+                                    id="signup-password"
                                     className={`${getInputClassName(passwordError)} pr-12`}
-                                    placeholder="비밀번호"
-                                    aria-label="비밀번호"
+                                    placeholder="8자 이상"
                                     autoComplete="new-password"
                                     type={
                                         isPasswordVisible ? "text" : "password"
@@ -242,13 +261,16 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </div>
 
                         <div className="flex flex-col gap-1">
+                            <label htmlFor="signup-password-confirm" className="text-xs font-semibold text-kta-text">
+                                비밀번호 확인
+                            </label>
                             <div className="relative">
                                 <input
+                                    id="signup-password-confirm"
                                     className={`${getInputClassName(
                                         passwordConfirmError,
                                     )} pr-12`}
-                                    placeholder="비밀번호 확인"
-                                    aria-label="비밀번호 확인"
+                                    placeholder="비밀번호를 다시 입력해주세요"
                                     autoComplete="new-password"
                                     type={
                                         isPasswordConfirmVisible

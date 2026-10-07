@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { PGlite } from "@electric-sql/pglite";
 import { getEmailError, getSignupErrors } from "../src/utils/authValidation.ts";
+import { formatMobilePhoneNumber } from "../src/utils/phone.ts";
 
 const validSignup = {
     email: "member@example.com",
@@ -24,6 +25,16 @@ test("signup validation accepts complete data and rejects invalid values", () =>
     assert.ok(getSignupErrors({ ...validSignup, password: "        " }, "        ").password);
     assert.ok(getSignupErrors(validSignup, "wrong password").passwordConfirm);
     assert.equal(getSignupErrors(validSignup, validSignup.password).password, undefined);
+    assert.equal(getSignupErrors({ ...validSignup, phoneNumber: "010-402-3617" }, validSignup.password).phoneNumber, undefined);
+});
+
+test("mobile number formatting handles 10 and 11 digits and transitions between them", () => {
+    assert.equal(formatMobilePhoneNumber("0104023617"), "010-402-3617");
+    assert.equal(formatMobilePhoneNumber("010-402-3617"), "010-402-3617");
+    assert.equal(formatMobilePhoneNumber("01040236178"), "010-4023-6178");
+    assert.equal(formatMobilePhoneNumber("010-402-36178"), "010-4023-6178");
+    assert.equal(formatMobilePhoneNumber("010-4023-617"), "010-402-3617");
+    assert.equal(formatMobilePhoneNumber("010123456789"), "010-1234-5678");
 });
 
 test("member migration enforces privacy, uniqueness, and server-managed roles", async () => {
