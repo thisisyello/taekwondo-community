@@ -101,6 +101,14 @@ export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
                     </button>
 
                     <Link
+                        className="inline-flex min-h-11 items-center self-center text-sm text-kta-muted hover:text-kta-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kta-navy"
+                        to="/forgot-password"
+                        state={{ from: returnTo }}
+                    >
+                        비밀번호를 잊으셨나요?
+                    </Link>
+
+                    <Link
                         className="self-center text-sm font-bold text-kta-navy"
                         to="/signup"
                         state={{ from: returnTo }}

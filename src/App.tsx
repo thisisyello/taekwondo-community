@@ -7,6 +7,8 @@ import ChatsPage from "./pages/chat/ChatsPage";
 import DojangPage from "./pages/dojang/DojangPage";
 import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/LoginPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import MyPage from "./pages/account/MyPage";
 import PostDetailPage from "./pages/board/PostDetailPage";
 import PostEditorPage from "./pages/board/PostEditorPage";
@@ -180,6 +182,8 @@ export default function App() {
 
     return (
         <Routes>
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route
                 path="/login"
                 element={

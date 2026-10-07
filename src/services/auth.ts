@@ -72,3 +72,14 @@ export async function signOut(): Promise<void> {
     const { error } = await getSupabase().auth.signOut({ scope: "local" });
     if (error) throw new Error(getAuthErrorMessage(error));
 }
+
+export async function requestPasswordReset(email: string): Promise<void> {
+    const { error } = await getSupabase().auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (!error || error.code === "user_not_found") return;
+    if (error.code === "over_email_send_rate_limit" || error.code === "over_request_rate_limit") {
+        throw new Error("요청이 많습니다. 잠시 후 다시 시도해주세요.");
+    }
+    throw new Error("재설정 메일을 요청하지 못했습니다. 잠시 후 다시 시도해주세요.");
+}
