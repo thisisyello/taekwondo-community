@@ -1,7 +1,7 @@
 # Taekwondo Community
 
 태권도 커뮤니티 서비스를 위한 React 기반 프론트엔드 프로젝트입니다.
-현재는 서비스 핵심 흐름을 빠르게 검증하기 위해 로컬 state 기반으로 게시글, 댓글, 검색, 정렬, 조회수, 좋아요 기능을 구현하고 있으며, 이후 인증, 권한, API, 데이터 저장소를 연동해 확장할 계획입니다.
+회원가입과 로그인은 Supabase Auth와 PostgreSQL 회원 테이블에 연결되어 있습니다. 게시글, 댓글, 검색, 정렬, 조회수, 좋아요는 아직 로컬 state로 관리되며 이후 데이터 저장소에 연결할 계획입니다.
 
 ## Tech Stack
 
@@ -10,9 +10,13 @@
 - Vite
 - Tailwind CSS
 - React Router
+- Supabase Auth / PostgreSQL
 
 ## Features
 
+- 이메일/비밀번호 회원가입, 이메일 인증, 로그인/로그아웃
+- 인증 세션 복원과 토큰 갱신
+- 공용 닉네임과 본인 전용 개인정보 분리 저장
 - 게시글 목록 조회
 - 게시판별 게시글 필터링
 - 최신순, 오래된순, 댓글 많은순 정렬
@@ -33,6 +37,24 @@
 
 ## Getting Started
 
+Node.js 24 이상을 권장합니다. `.env.local`에 다음 값을 설정합니다.
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+`.env.local`은 Git에서 제외됩니다. 관리자용 secret/service_role 키는 프런트엔드에 넣지 않습니다.
+
+### Supabase Setup
+
+1. Supabase SQL Editor에서 `supabase/migrations/202610070001_member_profiles.sql`을 한 번 실행합니다. 새 프로젝트 기준이며 기존 회원은 자동으로 이전하지 않습니다.
+2. Authentication 설정에서 이메일/비밀번호 로그인을 활성화하고 이메일 인증을 유지합니다. 최소 비밀번호 길이는 8자로 설정합니다.
+3. URL Configuration의 Site URL을 실제 개발 서버 주소로 설정하고, Redirect URLs에 해당 주소의 `/auth/callback`을 등록합니다. 예: `http://localhost:5173/auth/callback`. 포트나 호스트가 바뀌면 함께 갱신합니다.
+4. 일반 사용자에게 인증 메일을 보내려면 Custom SMTP를 설정합니다. 기본 발송은 프로젝트 팀에 등록된 이메일만 지원합니다. [공식 SMTP 안내](https://supabase.com/docs/guides/auth/auth-smtp)
+
+가입 시 DB 트리거가 `profiles`와 `account_details`를 함께 생성합니다. 닉네임은 대소문자와 앞뒤 공백을 무시하고 중복을 금지합니다. 닉네임은 공개 조회 가능하지만 실명, 생년월일, 전화번호는 본인만 조회할 수 있습니다. 역할은 DB에서 기본값 `member`로 부여하며 클라이언트에서 변경할 수 없습니다. 개인정보 입력은 전화번호 본인 인증이나 도장 인증을 의미하지 않습니다.
+
 ```bash
 npm install
 npm run dev
@@ -44,12 +66,18 @@ npm run dev
 npm run dev
 npm run build
 npm run lint
+npm test
 npm run preview
 ```
 
 ## Project Structure
 
 - `src/App.tsx`: 전체 상태 관리, 라우팅, 게시글/댓글 이벤트 처리
+- `src/lib/supabase.ts`: Supabase 클라이언트와 환경변수 연결
+- `src/services/auth.ts`: 인증 요청과 회원 정보 조회
+- `src/hooks/useAuth.ts`: 인증 상태 구독과 현재 회원 복원
+- `supabase/migrations/`: 회원 테이블, 접근 권한, 가입 트리거 SQL
+- `tests/auth.test.mjs`: 입력 검증과 로컬 PostgreSQL 접근 권한 테스트
 - `src/pages/auth/`: 로그인과 회원가입 화면
 - `src/pages/board/BoardPage.tsx`: 게시글 목록 화면
 - `src/pages/board/SearchPage.tsx`: 게시글 검색 화면
@@ -74,6 +102,9 @@ npm run preview
 
 ## Routes
 
+- `/login`: 로그인
+- `/signup`: 회원가입과 이메일 인증 안내
+- `/auth/callback`: 이메일 인증 복귀
 - `/`: 게시글 목록
 - `/search`: 게시글 검색
 - `/posts/new`: 게시글 작성
@@ -82,18 +113,18 @@ npm run preview
 
 ## Current Limitations
 
-- 현재 단계에서는 데이터가 서버나 DB가 아닌 로컬 state로만 관리됩니다.
+- 회원 정보와 인증은 Supabase에 저장되며, 게시글과 댓글은 로컬 state로 관리됩니다.
 - 새로고침하면 작성한 게시글, 댓글, 조회수, 좋아요 변경이 초기화됩니다.
-- 인증과 권한이 없어 누구나 게시글과 댓글을 수정/삭제할 수 있습니다.
+- 글쓰기와 댓글 작성은 로그인이 필요하고 수정/삭제 버튼은 작성자에게만 표시됩니다. 게시판 데이터의 서버 권한 검증은 게시판 DB 연결 시 구현해야 합니다.
+- 비밀번호 재설정과 도장 인증은 아직 연결되지 않았습니다.
 - 좋아요 중복 방지는 아직 없습니다.
 - 공지와 상단 고정 정책은 아직 확정하지 않았습니다.
 - 실제 페이지네이션 API가 아니라 클라이언트 배열을 나누어 보여주는 방식입니다.
 
 ## Next Steps
 
-- 샘플 데이터 확장
-- 로그인/회원 구조 설계
-- 작성자 권한 기반 수정/삭제 처리
+- 비밀번호 재설정
+- 게시판 DB 연결과 서버 권한 검증
 - 사용자별 좋아요 중복 방지
 - 공지와 상단 고정 정책 정리
 - API와 데이터 저장소 연동

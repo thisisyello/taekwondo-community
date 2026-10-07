@@ -1,18 +1,30 @@
 import { useNavigate } from "react-router";
+import { useState } from "react";
 import type { CurrentUser } from "../../types/user";
 import { formatDate } from "../../utils/date";
 
 type MyPageProps = {
     currentUser: CurrentUser;
-    onLogout: () => void;
+    onLogout: () => Promise<void>;
 };
 
 export default function MyPage({ currentUser, onLogout }: MyPageProps) {
     const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState<string | null>(null);
 
-    const handleLogout = () => {
-        onLogout();
-        navigate("/login");
+    const handleLogout = async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+        setLogoutError(null);
+        try {
+            await onLogout();
+            navigate("/", { replace: true });
+        } catch (error) {
+            setLogoutError(error instanceof Error ? error.message : "로그아웃하지 못했습니다.");
+        } finally {
+            setIsLoggingOut(false);
+        }
     };
 
     return (
@@ -44,7 +56,7 @@ export default function MyPage({ currentUser, onLogout }: MyPageProps) {
 
             <InfoSection
                 items={[
-                    ["아이디", currentUser.loginId],
+                    ["이메일", currentUser.email],
                     ["가입일", formatDate(currentUser.createdAt)],
                 ]}
                 title="계정정보"
@@ -60,12 +72,14 @@ export default function MyPage({ currentUser, onLogout }: MyPageProps) {
                 </p>
             </section>
 
+            {logoutError && <p role="alert" className="text-sm text-kta-red">{logoutError}</p>}
             <button
                 className="h-11 w-full rounded-kta-md bg-kta-subtle text-sm font-bold text-kta-muted"
                 onClick={handleLogout}
                 type="button"
+                disabled={isLoggingOut}
             >
-                로그아웃
+                {isLoggingOut ? "로그아웃 중…" : "로그아웃"}
             </button>
         </>
     );

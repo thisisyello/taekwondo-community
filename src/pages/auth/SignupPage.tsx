@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
-import type { SignupFormData } from "../../types/user";
+import type { SignupFormData, SignupResult } from "../../types/user";
+import { getSignupErrors } from "../../utils/authValidation";
 
 type SignupPageProps = {
-    onSignup: (signupData: SignupFormData) => void;
+    onSignup: (signupData: SignupFormData) => Promise<SignupResult>;
 };
 
 export default function SignupPage({ onSignup }: SignupPageProps) {
@@ -12,7 +13,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
     const [name, setName] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [loginId, setLoginId] = useState("");
+    const [email, setEmail] = useState("");
     const [nickname, setNickname] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -20,45 +21,62 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
     const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] =
         useState(false);
     const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
 
-    const nameError = hasSubmitted && !name.trim();
-    const birthDateError = hasSubmitted && !birthDate;
-    const phoneNumberError = hasSubmitted && !phoneNumber.trim();
-    const loginIdError = hasSubmitted && !loginId.trim();
-    const nicknameError = hasSubmitted && !nickname.trim();
-    const passwordError = hasSubmitted && !password.trim();
-    const passwordConfirmError =
-        hasSubmitted &&
-        (!passwordConfirm.trim() || passwordConfirm !== password);
+    const signupData = { email, password, name, birthDate, phoneNumber, nickname };
+    const errors = hasSubmitted ? getSignupErrors(signupData, passwordConfirm) : {};
+
+    const nameError = errors.name;
+    const birthDateError = errors.birthDate;
+    const phoneNumberError = errors.phoneNumber;
+    const emailError = errors.email;
+    const nicknameError = errors.nickname;
+    const passwordError = errors.password;
+    const passwordConfirmError = errors.passwordConfirm;
     const hasPasswordConfirmValue = passwordConfirm.length > 0;
     const isPasswordConfirmMatched =
         hasPasswordConfirmValue && passwordConfirm === password;
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setHasSubmitted(true);
 
-        if (
-            !name.trim() ||
-            !birthDate ||
-            !phoneNumber.trim() ||
-            !loginId.trim() ||
-            !nickname.trim() ||
-            !password.trim() ||
-            passwordConfirm !== password
-        ) {
-            return;
+        if (isSubmitting || Object.values(getSignupErrors(signupData, passwordConfirm)).some(Boolean)) return;
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            const result = await onSignup(signupData);
+            setPassword("");
+            setPasswordConfirm("");
+            if (result.needsEmailConfirmation) setConfirmationEmail(email.trim());
+            else navigate("/", { replace: true });
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : "회원가입하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsSubmitting(false);
         }
-
-        onSignup({
-            loginId: loginId.trim(),
-            name: name.trim(),
-            birthDate,
-            phoneNumber: phoneNumber.trim(),
-            nickname: nickname.trim(),
-        });
-        navigate("/");
     };
+
+    if (confirmationEmail) {
+        return (
+            <section className="flex min-h-svh items-center justify-center bg-kta-bg px-4 text-kta-text">
+                <div className="w-full max-w-md text-center">
+                    <h1 className="text-xl font-bold">이메일 인증을 완료해주세요</h1>
+                    <p role="status" className="mt-4 break-all text-sm leading-6 text-kta-muted">
+                        {confirmationEmail}로 인증 안내를 요청했습니다. 메일을 확인하고 인증을 완료해주세요.
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-kta-muted">
+                        이미 가입한 이메일이라면 로그인해주세요. 메일이 보이지 않으면 스팸함도 확인해주세요.
+                    </p>
+                    <Link className="mt-6 inline-flex min-h-11 items-center rounded-kta-sm bg-kta-navy px-5 text-sm font-bold text-white" to="/login">
+                        로그인으로 이동
+                    </Link>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
@@ -75,6 +93,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                 <form
                     className="mt-4 flex flex-col gap-3 rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm"
                     onSubmit={handleSubmit}
+                    noValidate
                 >
                     <fieldset className="flex flex-col gap-3">
                         <legend className="mb-1 text-sm font-black text-kta-navy">
@@ -86,6 +105,9 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                                 autoFocus
                                 className={getInputClassName(nameError)}
                                 placeholder="이름"
+                                aria-label="이름"
+                                autoComplete="name"
+                                maxLength={80}
                                 value={name}
                                 onChange={(event) =>
                                     setName(event.target.value)
@@ -93,7 +115,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             />
                             {nameError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    이름을 입력해주세요.
+                                    {nameError}
                                 </p>
                             )}
                         </div>
@@ -102,6 +124,8 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             <input
                                 className={getInputClassName(birthDateError)}
                                 type="date"
+                                aria-label="생년월일"
+                                autoComplete="bday"
                                 value={birthDate}
                                 onChange={(event) =>
                                     setBirthDate(event.target.value)
@@ -109,7 +133,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             />
                             {birthDateError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    생년월일을 입력해주세요.
+                                    {birthDateError}
                                 </p>
                             )}
                         </div>
@@ -118,6 +142,9 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             <input
                                 className={getInputClassName(phoneNumberError)}
                                 inputMode="tel"
+                                type="tel"
+                                aria-label="전화번호"
+                                autoComplete="tel"
                                 placeholder="전화번호"
                                 value={phoneNumber}
                                 onChange={(event) =>
@@ -126,7 +153,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             />
                             {phoneNumberError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    전화번호를 입력해주세요.
+                                    {phoneNumberError}
                                 </p>
                             )}
                         </div>
@@ -138,25 +165,18 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </legend>
 
                         <div className="flex flex-col gap-1">
-                            <div className="grid gap-2 sm:grid-cols-[1fr_104px]">
-                                <input
-                                    className={getInputClassName(loginIdError)}
-                                    placeholder="아이디"
-                                    value={loginId}
-                                    onChange={(event) =>
-                                        setLoginId(event.target.value)
-                                    }
-                                />
-                                <button
-                                    className="h-12 rounded-kta-md bg-kta-subtle px-3 text-sm font-bold text-kta-navy"
-                                    type="button"
-                                >
-                                    중복체크
-                                </button>
-                            </div>
-                            {loginIdError && (
+                            <input
+                                className={getInputClassName(emailError)}
+                                placeholder="이메일"
+                                aria-label="이메일"
+                                type="email"
+                                autoComplete="email"
+                                value={email}
+                                onChange={(event) => setEmail(event.target.value)}
+                            />
+                            {emailError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    아이디를 입력해주세요.
+                                    {emailError}
                                 </p>
                             )}
                         </div>
@@ -165,6 +185,9 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             <input
                                 className={getInputClassName(nicknameError)}
                                 placeholder="공용 닉네임"
+                                aria-label="공용 닉네임"
+                                autoComplete="nickname"
+                                maxLength={30}
                                 value={nickname}
                                 onChange={(event) =>
                                     setNickname(event.target.value)
@@ -172,7 +195,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             />
                             {nicknameError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    공용 닉네임을 입력해주세요.
+                                    {nicknameError}
                                 </p>
                             )}
                         </div>
@@ -180,8 +203,10 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         <div className="flex flex-col gap-1">
                             <div className="relative">
                                 <input
-                                    className={getInputClassName(passwordError)}
+                                    className={`${getInputClassName(passwordError)} pr-12`}
                                     placeholder="비밀번호"
+                                    aria-label="비밀번호"
+                                    autoComplete="new-password"
                                     type={
                                         isPasswordVisible ? "text" : "password"
                                     }
@@ -211,7 +236,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                             </div>
                             {passwordError && (
                                 <p className="text-xs font-semibold text-kta-red">
-                                    비밀번호를 입력해주세요.
+                                    {passwordError}
                                 </p>
                             )}
                         </div>
@@ -219,10 +244,12 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         <div className="flex flex-col gap-1">
                             <div className="relative">
                                 <input
-                                    className={getInputClassName(
+                                    className={`${getInputClassName(
                                         passwordConfirmError,
-                                    )}
+                                    )} pr-12`}
                                     placeholder="비밀번호 확인"
+                                    aria-label="비밀번호 확인"
+                                    autoComplete="new-password"
                                     type={
                                         isPasswordConfirmVisible
                                             ? "text"
@@ -275,11 +302,13 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
                         </div>
                     </fieldset>
 
+                    {submitError && <p role="alert" className="text-sm text-kta-red">{submitError}</p>}
                     <button
-                        className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
+                        className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
                         type="submit"
+                        disabled={isSubmitting}
                     >
-                        가입하기
+                        {isSubmitting ? "가입 중…" : "가입하기"}
                     </button>
 
                     <Link
@@ -294,7 +323,7 @@ export default function SignupPage({ onSignup }: SignupPageProps) {
     );
 }
 
-const getInputClassName = (hasError: boolean) => {
+const getInputClassName = (hasError: string | undefined) => {
     return hasError
         ? "h-12 w-full rounded-kta-md border border-kta-red px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-red"
         : "h-12 w-full rounded-kta-md border border-kta-border px-3 text-sm outline-none placeholder:text-kta-muted focus:border-kta-navy";

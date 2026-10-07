@@ -13,6 +13,7 @@ import PostEditorPage from "./pages/board/PostEditorPage";
 import SearchPage from "./pages/board/SearchPage";
 import SignupPage from "./pages/auth/SignupPage";
 import { useToast } from "./hooks/useToast";
+import { useAuth } from "./hooks/useAuth";
 import {
     filterPostsByBoard,
     getCommentCountsByPostId,
@@ -27,7 +28,7 @@ import type {
     PostFormData,
     PostSortType,
 } from "./types/board";
-import type { CurrentUser, SignupFormData } from "./types/user";
+import type { CurrentUser } from "./types/user";
 
 const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
     id: user.id,
@@ -36,7 +37,8 @@ const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
 
 export default function App() {
     const location = useLocation();
-    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+    const { currentUser, isLoading: isAuthLoading, error: authError, signIn, signUp, signOut } = useAuth();
+    const showToast = useToast();
     const [posts, setPosts] = useState<Post[]>(initialPosts);
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const requestedPath: unknown = location.state?.from;
@@ -55,42 +57,6 @@ export default function App() {
         postSortType,
         commentCountsByPostId,
     );
-
-    const handleLogin = (loginId: string) => {
-        const now = new Date().toISOString();
-
-        setCurrentUser({
-            id: `user-${Date.now()}`,
-            loginId,
-            name: loginId,
-            birthDate: "",
-            phoneNumber: "",
-            nickname: loginId,
-            role: "member",
-            createdAt: now,
-            updatedAt: now,
-        });
-    };
-
-    const handleSignup = (signupData: SignupFormData) => {
-        const now = new Date().toISOString();
-
-        setCurrentUser({
-            id: `user-${Date.now()}`,
-            loginId: signupData.loginId,
-            name: signupData.name,
-            birthDate: signupData.birthDate,
-            phoneNumber: signupData.phoneNumber,
-            nickname: signupData.nickname,
-            role: "member",
-            createdAt: now,
-            updatedAt: now,
-        });
-    };
-
-    const handleLogout = () => {
-        setCurrentUser(null);
-    };
 
     const handleCreatePost = (post: PostFormData) => {
         if (!currentUser) {
@@ -188,6 +154,30 @@ export default function App() {
         setComments((prev) => prev.filter((comment) => comment.id !== id));
     };
 
+    if (isAuthLoading) {
+        return (
+            <section className="flex min-h-svh items-center justify-center bg-kta-bg px-4 text-sm text-kta-muted" role="status">
+                로그인 정보를 확인하고 있습니다.
+            </section>
+        );
+    }
+
+    if (authError) {
+        return (
+            <section className="flex min-h-svh flex-col items-center justify-center gap-4 bg-kta-bg px-4 text-center">
+                <p role="alert" className="text-sm text-kta-red">{authError}</p>
+                <button className="rounded-kta-sm bg-kta-navy px-4 py-3 text-sm font-bold text-white" onClick={() => window.location.reload()}>
+                    다시 시도
+                </button>
+                <button className="text-sm font-semibold text-kta-muted" onClick={() => {
+                    void signOut().catch(() => showToast("로그아웃하지 못했습니다. 다시 시도해주세요."));
+                }}>
+                    로그아웃
+                </button>
+            </section>
+        );
+    }
+
     return (
         <Routes>
             <Route
@@ -197,7 +187,7 @@ export default function App() {
                         <Navigate to={returnTo} replace />
                     ) : (
                         <LoginPage
-                            onLogin={handleLogin}
+                            onLogin={signIn}
                             returnTo={returnTo}
                         />
                     )
@@ -209,9 +199,18 @@ export default function App() {
                     currentUser ? (
                         <Navigate to="/" replace />
                     ) : (
-                        <SignupPage onSignup={handleSignup} />
+                        <SignupPage onSignup={signUp} />
                     )
                 }
+            />
+            <Route
+                path="/auth/callback"
+                element={currentUser ? <Navigate to="/" replace /> : (
+                    <section className="flex min-h-svh flex-col items-center justify-center gap-4 bg-kta-bg px-4 text-center">
+                        <p className="text-sm text-kta-muted">인증 링크가 만료되었거나 인증을 완료하지 못했습니다.</p>
+                        <a className="text-sm font-bold text-kta-navy" href="/login">로그인으로 돌아가기</a>
+                    </section>
+                )}
             />
             <Route
                 path="/"
@@ -277,7 +276,7 @@ export default function App() {
                         <AppLayout title="내정보" showBackButton>
                             <MyPage
                                 currentUser={currentUser}
-                                onLogout={handleLogout}
+                                onLogout={signOut}
                             />
                         </AppLayout>
                     ) : (

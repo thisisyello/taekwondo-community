@@ -2,7 +2,7 @@ export type UserRole = "member" | "admin";
 
 export type User = {
     id: string;
-    loginId: string;
+    email: string;
     name: string;
     birthDate: string;
     phoneNumber: string;
@@ -16,9 +16,14 @@ export type User = {
 export type CurrentUser = User;
 
 export type SignupFormData = {
-    loginId: string;
+    email: string;
+    password: string;
     name: string;
     birthDate: string;
     phoneNumber: string;
     nickname: string;
+};
+
+export type SignupResult = {
+    needsEmailConfirmation: boolean;
 };

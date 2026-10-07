@@ -1,27 +1,37 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { getEmailError } from "../../utils/authValidation";
 
 type LoginPageProps = {
-    onLogin: (loginId: string) => void;
+    onLogin: (email: string, password: string) => Promise<void>;
     returnTo: string;
 };
 
 export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
     const navigate = useNavigate();
-    const [loginId, setLoginId] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [hasSubmitted, setHasSubmitted] = useState(false);
-    const loginIdError = hasSubmitted && !loginId.trim();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const emailError = hasSubmitted ? getEmailError(email) : undefined;
     const passwordError = hasSubmitted && !password.trim();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setHasSubmitted(true);
 
-        if (!loginId.trim() || !password.trim()) return;
-
-        onLogin(loginId.trim());
-        navigate(returnTo, { replace: true });
+        if (isSubmitting || getEmailError(email) || !password) return;
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            await onLogin(email.trim(), password);
+            navigate(returnTo, { replace: true });
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : "로그인하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -39,20 +49,25 @@ export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
                 <form
                     className="mt-4 flex flex-col gap-3 rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm"
                     onSubmit={handleSubmit}
+                    noValidate
                 >
                     <div className="flex flex-col gap-1">
                         <input
                             autoFocus
-                            className={getInputClassName(loginIdError)}
-                            placeholder="아이디"
-                            value={loginId}
+                            className={getInputClassName(Boolean(emailError))}
+                            placeholder="이메일"
+                            aria-label="이메일"
+                            type="email"
+                            autoComplete="username"
+                            aria-invalid={Boolean(emailError)}
+                            value={email}
                             onChange={(event) =>
-                                setLoginId(event.target.value)
+                                setEmail(event.target.value)
                             }
                         />
-                        {loginIdError && (
+                        {emailError && (
                             <p className="text-xs font-semibold text-kta-red">
-                                아이디를 입력해주세요.
+                                {emailError}
                             </p>
                         )}
                     </div>
@@ -62,6 +77,8 @@ export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
                             className={getInputClassName(passwordError)}
                             placeholder="비밀번호"
                             type="password"
+                            aria-label="비밀번호"
+                            autoComplete="current-password"
                             value={password}
                             onChange={(event) =>
                                 setPassword(event.target.value)
@@ -74,16 +91,19 @@ export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
                         )}
                     </div>
 
+                    {submitError && <p role="alert" className="text-sm text-kta-red">{submitError}</p>}
                     <button
-                        className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white"
+                        className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
                         type="submit"
+                        disabled={isSubmitting}
                     >
-                        로그인
+                        {isSubmitting ? "로그인 중…" : "로그인"}
                     </button>
 
                     <Link
                         className="self-center text-sm font-bold text-kta-navy"
                         to="/signup"
+                        state={{ from: returnTo }}
                     >
                         계정이 없으신가요? 회원가입
                     </Link>
