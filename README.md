@@ -50,7 +50,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 
 1. Supabase SQL Editor에서 `supabase/migrations/202610070001_member_profiles.sql`을 한 번 실행합니다. 새 프로젝트 기준이며 기존 회원은 자동으로 이전하지 않습니다.
 2. Authentication 설정에서 이메일/비밀번호 로그인을 활성화하고 이메일 인증을 유지합니다. 최소 비밀번호 길이는 8자로 설정합니다.
-3. URL Configuration의 Site URL을 실제 개발 서버 주소로 설정하고, Redirect URLs에 해당 주소의 `/auth/callback`을 등록합니다. 예: `http://localhost:5173/auth/callback`. 포트나 호스트가 바뀌면 함께 갱신합니다.
+3. URL Configuration의 Site URL을 실제 개발 서버 주소로 설정하고, Redirect URLs에 해당 주소의 `/auth/callback`과 `/reset-password`를 등록합니다. 예: `http://localhost:5173/auth/callback`, `http://localhost:5173/reset-password`. 포트나 호스트가 바뀌면 함께 갱신합니다.
 4. 일반 사용자에게 인증 메일을 보내려면 Custom SMTP를 설정합니다. 기본 발송은 프로젝트 팀에 등록된 이메일만 지원합니다. [공식 SMTP 안내](https://supabase.com/docs/guides/auth/auth-smtp)
 
 가입 시 DB 트리거가 `profiles`와 `account_details`를 함께 생성합니다. 닉네임은 대소문자와 앞뒤 공백을 무시하고 중복을 금지합니다. 닉네임은 공개 조회 가능하지만 실명, 생년월일, 전화번호는 본인만 조회할 수 있습니다. 역할은 DB에서 기본값 `member`로 부여하며 클라이언트에서 변경할 수 없습니다. 개인정보 입력은 전화번호 본인 인증이나 도장 인증을 의미하지 않습니다.
@@ -105,6 +105,8 @@ npm run preview
 - `/login`: 로그인
 - `/signup`: 회원가입과 이메일 인증 안내
 - `/auth/callback`: 이메일 인증 복귀
+- `/forgot-password`: 비밀번호 재설정 메일 요청
+- `/reset-password`: 메일 링크 인증 후 새 비밀번호 설정
 - `/`: 게시글 목록
 - `/search`: 게시글 검색
 - `/posts/new`: 게시글 작성
@@ -116,14 +118,14 @@ npm run preview
 - 회원 정보와 인증은 Supabase에 저장되며, 게시글과 댓글은 로컬 state로 관리됩니다.
 - 새로고침하면 작성한 게시글, 댓글, 조회수, 좋아요 변경이 초기화됩니다.
 - 글쓰기와 댓글 작성은 로그인이 필요하고 수정/삭제 버튼은 작성자에게만 표시됩니다. 게시판 데이터의 서버 권한 검증은 게시판 DB 연결 시 구현해야 합니다.
-- 비밀번호 재설정과 도장 인증은 아직 연결되지 않았습니다.
+- 비밀번호 재설정은 Supabase 메일 링크로 인증한 뒤 진행하며, 완료 후 현재 브라우저에서 로그아웃합니다. 기본 메일 발송 제한에 걸리면 재설정 메일 요청도 제한됩니다.
+- 도장 인증은 아직 연결되지 않았습니다.
 - 좋아요 중복 방지는 아직 없습니다.
 - 공지와 상단 고정 정책은 아직 확정하지 않았습니다.
 - 실제 페이지네이션 API가 아니라 클라이언트 배열을 나누어 보여주는 방식입니다.
 
 ## Next Steps
 
-- 비밀번호 재설정
 - 게시판 DB 연결과 서버 권한 검증
 - 사용자별 좋아요 중복 방지
 - 공지와 상단 고정 정책 정리

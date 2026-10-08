@@ -39,7 +39,7 @@ const getBoardAuthor = (user: CurrentUser): BoardAuthor => ({
 
 export default function App() {
     const location = useLocation();
-    const { currentUser, isLoading: isAuthLoading, error: authError, signIn, signUp, signOut } = useAuth();
+    const { currentUser, isLoading: isAuthLoading, error: authError, recoveryUserId, signIn, signUp, signOut } = useAuth();
     const showToast = useToast();
     const [posts, setPosts] = useState<Post[]>(initialPosts);
     const [comments, setComments] = useState<Comment[]>(initialComments);
@@ -164,7 +164,7 @@ export default function App() {
         );
     }
 
-    if (authError) {
+    if (authError && location.pathname !== "/reset-password") {
         return (
             <section className="flex min-h-svh flex-col items-center justify-center gap-4 bg-kta-bg px-4 text-center">
                 <p role="alert" className="text-sm text-kta-red">{authError}</p>
@@ -183,7 +183,7 @@ export default function App() {
     return (
         <Routes>
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage recoveryUserId={recoveryUserId} />} />
             <Route
                 path="/login"
                 element={

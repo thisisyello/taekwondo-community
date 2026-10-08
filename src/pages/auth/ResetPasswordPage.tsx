@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useToast } from "../../hooks/useToast";
+import { resetPassword, signOut } from "../../services/auth";
 
-export default function ResetPasswordPage() {
+type ResetPasswordPageProps = { recoveryUserId: string | null };
+
+export default function ResetPasswordPage({ recoveryUserId }: ResetPasswordPageProps) {
     const showToast = useToast();
+    const navigate = useNavigate();
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [hasChanged, setHasChanged] = useState(false);
     const passwordError = !password.trim() || password.length < 8
         ? "비밀번호는 8자 이상 입력해주세요."
         : undefined;
@@ -19,11 +26,37 @@ export default function ResetPasswordPage() {
             ? "비밀번호가 일치하지 않습니다."
             : undefined;
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const finishReset = async () => {
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            await signOut();
+            showToast("비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.");
+            navigate("/login", { replace: true });
+        } catch {
+            setSubmitError("비밀번호는 변경되었지만 로그아웃하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setHasSubmitted(true);
-        if (passwordError || confirmError) return;
-        showToast("비밀번호 변경 기능은 아직 연결되지 않았습니다.");
+        if (isSubmitting || !recoveryUserId || passwordError || confirmError) return;
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            await resetPassword(password, recoveryUserId);
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : "비밀번호를 변경하지 못했습니다. 다시 시도해주세요.");
+            setIsSubmitting(false);
+            return;
+        }
+        setHasChanged(true);
+        setPassword("");
+        setPasswordConfirm("");
+        await finishReset();
     };
 
     const fields = [
@@ -49,6 +82,29 @@ export default function ResetPasswordPage() {
         },
     ];
 
+    if (hasChanged || !recoveryUserId) {
+        return (
+            <section className="flex min-h-svh items-center justify-center bg-kta-bg px-4 py-5 text-kta-text">
+                <div className="flex w-full max-w-md flex-col gap-4">
+                    <h1 className="text-2xl font-bold">{hasChanged ? "비밀번호 변경 완료" : "유효하지 않은 재설정 링크"}</h1>
+                    <p className="text-sm text-kta-muted">
+                        {hasChanged ? "새 비밀번호로 다시 로그인해주세요." : "링크가 만료되었거나 인증을 확인할 수 없습니다. 재설정 메일을 다시 요청해주세요."}
+                    </p>
+                    {submitError && <p role="alert" className="text-sm text-kta-red">{submitError}</p>}
+                    {hasChanged ? (
+                        <button type="button" disabled={isSubmitting} onClick={() => void finishReset()} className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white disabled:opacity-60">
+                            {isSubmitting ? "로그아웃 중…" : "로그아웃 후 로그인"}
+                        </button>
+                    ) : (
+                        <Link to="/forgot-password" replace className="flex min-h-12 items-center justify-center rounded-kta-md bg-kta-navy text-sm font-bold text-white">
+                            재설정 메일 다시 요청
+                        </Link>
+                    )}
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section className="min-h-svh bg-kta-bg px-4 py-5 text-kta-text">
             <div className="mx-auto flex min-h-[calc(100svh-40px)] max-w-md flex-col justify-center">
@@ -66,6 +122,7 @@ export default function ResetPasswordPage() {
                                     autoComplete="new-password"
                                     placeholder={field.placeholder}
                                     value={field.value}
+                                    disabled={isSubmitting}
                                     onChange={(event) => field.onChange(event.target.value)}
                                     aria-invalid={Boolean(field.error)}
                                     aria-describedby={field.error ? `${field.id}-error` : undefined}
@@ -73,6 +130,7 @@ export default function ResetPasswordPage() {
                                 />
                                 <button
                                     type="button"
+                                    disabled={isSubmitting}
                                     onClick={field.toggle}
                                     aria-label={`${field.label} ${field.visible ? "숨기기" : "보기"}`}
                                     aria-pressed={field.visible}
@@ -92,8 +150,9 @@ export default function ResetPasswordPage() {
                             )}
                         </div>
                     ))}
-                    <button type="submit" className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white">
-                        비밀번호 변경
+                    {submitError && <p role="alert" className="text-sm text-kta-red">{submitError}</p>}
+                    <button type="submit" disabled={isSubmitting} className="h-12 rounded-kta-md bg-kta-navy text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60">
+                        {isSubmitting ? "비밀번호 변경 중…" : "비밀번호 변경"}
                     </button>
                     <Link to="/login" className="inline-flex min-h-11 items-center justify-center self-center text-sm font-semibold text-kta-navy">
                         로그인으로 돌아가기

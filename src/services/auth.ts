@@ -83,3 +83,23 @@ export async function requestPasswordReset(email: string): Promise<void> {
     }
     throw new Error("재설정 메일을 요청하지 못했습니다. 잠시 후 다시 시도해주세요.");
 }
+
+export async function resetPassword(password: string, recoveryUserId: string): Promise<void> {
+    const client = getSupabase();
+    const { data, error: userError } = await client.auth.getUser();
+    if (userError || data.user?.id !== recoveryUserId) {
+        throw new Error("인증이 만료되었거나 유효하지 않습니다. 재설정 메일을 다시 요청해주세요.");
+    }
+    const { error } = await client.auth.updateUser({ password });
+    if (!error) return;
+    if (error.code === "same_password") {
+        throw new Error("기존 비밀번호와 다른 비밀번호를 입력해주세요.");
+    }
+    if (error.code === "session_not_found" || error.code === "refresh_token_not_found" || error.status === 401) {
+        throw new Error("인증이 만료되었거나 유효하지 않습니다. 재설정 메일을 다시 요청해주세요.");
+    }
+    if (error.code === "weak_password" || error.code === "over_request_rate_limit") {
+        throw new Error(getAuthErrorMessage(error));
+    }
+    throw new Error("비밀번호를 변경하지 못했습니다. 잠시 후 다시 시도해주세요.");
+}
