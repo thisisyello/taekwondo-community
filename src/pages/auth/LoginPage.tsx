@@ -17,7 +17,7 @@ export default function LoginPage({ onLogin, returnTo }: LoginPageProps) {
     const emailError = hasSubmitted ? getEmailError(email) : undefined;
     const passwordError = hasSubmitted && !password.trim();
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         setHasSubmitted(true);
 

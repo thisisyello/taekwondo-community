@@ -29,7 +29,7 @@ export default function PostForm({
   const titleError = hasSubmitted && !title.trim();
   const contentError = hasSubmitted && !content.trim();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setHasSubmitted(true);

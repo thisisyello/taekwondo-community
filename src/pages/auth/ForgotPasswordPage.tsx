@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
     const [submitError, setSubmitError] = useState<string | null>(null);
     const emailError = hasSubmitted ? getEmailError(email) : undefined;
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         setHasSubmitted(true);
         if (isSubmitting || getEmailError(email)) return;

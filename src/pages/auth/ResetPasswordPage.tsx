@@ -40,7 +40,7 @@ export default function ResetPasswordPage({ recoveryUserId }: ResetPasswordPageP
         }
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         setHasSubmitted(true);
         if (isSubmitting || !recoveryUserId || passwordError || confirmError) return;

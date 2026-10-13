@@ -27,7 +27,7 @@ export default function CommentItem({
         setIsMenuOpen((prev) => !prev);
     };
 
-    const handleSubmitEdit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitEdit = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         setHasSubmittedEdit(true);

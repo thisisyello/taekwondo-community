@@ -10,7 +10,7 @@ export default function CommentForm({ onAddComment }: CommentFormProps) {
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const contentError = hasSubmitted && !content.trim();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         setHasSubmitted(true);
