@@ -7,7 +7,7 @@ const POSTS_PER_LOAD = 5;
 
 type PostListProps = {
     posts: Post[];
-    commentCountsByPostId: Record<number, number>;
+    commentCountsByPostId: Record<string, number>;
     postSortType: PostSortType;
     onChangePostSortType: (sortType: PostSortType) => void;
     emptyMessage?: string;
@@ -60,7 +60,7 @@ export default function PostList({
 
 type VisiblePostListProps = {
     posts: Post[];
-    commentCountsByPostId: Record<number, number>;
+    commentCountsByPostId: Record<string, number>;
 };
 
 function VisiblePostList({

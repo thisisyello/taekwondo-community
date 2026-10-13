@@ -12,11 +12,11 @@ type PostDetailPageProps = {
     post: Post;
     comments: Comment[];
     currentUserId: string | null;
-    onAddComment: (postId: number, comment: CommentFormData) => void;
-    onUpdateComment: (id: number, content: string) => void;
-    onDeleteComment: (id: number) => void;
-    onLikePost: (id: number) => void;
-    onDeletePost: (id: number) => void;
+    onAddComment?: (postId: string, comment: CommentFormData) => Promise<void>;
+    onUpdateComment?: (id: string, content: string) => void;
+    onDeleteComment?: (id: string) => void;
+    onLikePost?: (id: string) => void;
+    onDeletePost?: (id: string) => void;
 };
 
 export default function PostDetailPage({
@@ -32,13 +32,14 @@ export default function PostDetailPage({
     const navigate = useNavigate();
     const showToast = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const canManagePost = currentUserId === post.author.id;
+    const canManagePost = currentUserId !== null && currentUserId === post.author.id && Boolean(onDeletePost);
 
     const handleStartEdit = () => {
         setIsMenuOpen(false);
     };
 
     const handleDelete = () => {
+        if (!onDeletePost) return;
         setIsMenuOpen(false);
 
         const confirmed = window.confirm("게시글을 삭제하시겠습니까?");
@@ -103,6 +104,8 @@ export default function PostDetailPage({
                     {post.content}
                 </p>
                 <button
+                    disabled={Boolean(currentUserId) && !onLikePost}
+                    title={currentUserId && !onLikePost ? "현재 공감할 수 없습니다." : undefined}
                     className="mt-6 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-kta-red"
                     onClick={() => {
                         if (!currentUserId) {
@@ -114,7 +117,7 @@ export default function PostDetailPage({
                             });
                             return;
                         }
-                        onLikePost(post.id);
+                        onLikePost?.(post.id);
                     }}
                 >
                     <FiHeart aria-hidden="true" className="inline" /> 공감{" "}
@@ -127,21 +130,22 @@ export default function PostDetailPage({
                     댓글 {comments.length}
                 </h2>
                 <div className="mt-4">
-                    {currentUserId ? (
+                    {currentUserId && onAddComment ? (
                         <CommentForm
                             onAddComment={(comment) =>
                                 onAddComment(post.id, comment)
                             }
                         />
-                    ) : (
+                    ) : !currentUserId ? (
                         <Link
                             className="flex min-h-12 w-full items-center justify-center gap-2 rounded-kta-md border border-kta-border bg-kta-subtle px-4 py-3 text-sm font-semibold text-kta-navy transition-colors hover:border-kta-navy hover:bg-kta-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kta-navy"
                             to="/login"
+                            state={{ from: `/posts/${post.id}` }}
                         >
                             <FiLogIn aria-hidden="true" className="shrink-0 text-lg" />
                             <span>로그인하고 댓글 작성하기</span>
                         </Link>
-                    )}
+                    ) : null}
                 </div>
                 <div className="mt-5 border-t border-kta-border pt-5">
                     <CommentList

@@ -6,7 +6,7 @@ import type { BoardFilterType, Post, PostSortType } from "../../types/board";
 
 type BoardPageProps = {
     posts: Post[];
-    commentCountsByPostId: Record<number, number>;
+    commentCountsByPostId: Record<string, number>;
     postSortType: PostSortType;
     onChangePostSortType: (sortType: PostSortType) => void;
     selectedBoardType: BoardFilterType;
@@ -38,8 +38,8 @@ export default function BoardPage({
             />
 
             <Link
-                className="fixed bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md"
                 to="/posts/new"
+                className="fixed bottom-20 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-kta-navy px-5 py-3 text-sm font-bold text-white shadow-kta-md"
             >
                 <FiEdit3 aria-hidden="true" />
                 글쓰기

@@ -7,7 +7,7 @@ import type {
 } from "../types/board";
 
 export const getCommentCountsByPostId = (comments: Comment[]) => {
-    return comments.reduce<Record<number, number>>(
+    return comments.reduce<Record<string, number>>(
         (counts, comment) => ({
             ...counts,
             [comment.postId]: (counts[comment.postId] ?? 0) + 1,
@@ -64,7 +64,7 @@ export const filterPostsBySearch = (
 export const sortPosts = (
     posts: Post[],
     postSortType: PostSortType,
-    commentCountsByPostId: Record<number, number>,
+    commentCountsByPostId: Record<string, number>,
 ) => {
     return [...posts].sort((firstPost, secondPost) => {
         if (postSortType === "oldest") {

@@ -5,7 +5,7 @@ import { filterPostsBySearch, sortPosts } from "../../utils/postList";
 
 type SearchPageProps = {
     posts: Post[];
-    commentCountsByPostId: Record<number, number>;
+    commentCountsByPostId: Record<string, number>;
 };
 
 export default function SearchPage({

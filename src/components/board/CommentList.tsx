@@ -4,8 +4,8 @@ import CommentItem from "./CommentItem";
 type CommentListProps = {
     comments: Comment[];
     currentUserId: string | null;
-    onUpdateComment: (id: number, content: string) => void;
-    onDeleteComment: (id: number) => void;
+    onUpdateComment?: (id: string, content: string) => void;
+    onDeleteComment?: (id: string) => void;
 };
 
 export default function CommentList({

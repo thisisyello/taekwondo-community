@@ -6,8 +6,8 @@ import { formatDate, isEdited } from "../../utils/date";
 type CommentItemProps = {
     comment: Comment;
     currentUserId: string | null;
-    onUpdateComment: (id: number, content: string) => void;
-    onDeleteComment: (id: number) => void;
+    onUpdateComment?: (id: string, content: string) => void;
+    onDeleteComment?: (id: string) => void;
 };
 
 export default function CommentItem({
@@ -21,7 +21,7 @@ export default function CommentItem({
     const [content, setContent] = useState(comment.content);
     const [hasSubmittedEdit, setHasSubmittedEdit] = useState(false);
     const contentError = hasSubmittedEdit && !content.trim();
-    const canManageComment = currentUserId === comment.author.id;
+    const canManageComment = currentUserId !== null && currentUserId === comment.author.id && Boolean(onUpdateComment && onDeleteComment);
 
     const handleToggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -34,7 +34,7 @@ export default function CommentItem({
 
         if (!content.trim()) return;
 
-        onUpdateComment(comment.id, content);
+        onUpdateComment?.(comment.id, content);
         setIsEditing(false);
         setIsMenuOpen(false);
         setHasSubmittedEdit(false);
@@ -59,7 +59,7 @@ export default function CommentItem({
 
         if (!confirmed) return;
 
-        onDeleteComment(comment.id);
+        onDeleteComment?.(comment.id);
     };
 
     return (

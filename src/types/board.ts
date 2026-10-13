@@ -7,7 +7,7 @@ export type SearchTarget = "all" | "title" | "content" | "author";
 export type PostSortType = "latest" | "oldest" | "mostCommented";
 
 export type BoardAuthor = {
-    id: string;
+    id: string | null;
     nickname: string;
 };
 
@@ -43,7 +43,7 @@ export const BOARD_FILTER_OPTIONS: BoardFilterOption[] = [
 ];
 
 export type Post = {
-    id: number;
+    id: string;
     title: string;
     content: string;
     author: BoardAuthor;
@@ -60,8 +60,8 @@ export type PostFormData = Omit<
 >;
 
 export type Comment = {
-    id: number;
-    postId: number;
+    id: string;
+    postId: string;
     content: string;
     author: BoardAuthor;
     createdAt: string;
