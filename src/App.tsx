@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useParams } from "react-router";
 import AppLayout from "./components/layout/AppLayout";
+import BoardSkeleton from "./components/board/BoardSkeleton";
 import BoardPage from "./pages/board/BoardPage";
 import ChatsPage from "./pages/chat/ChatsPage";
 import DojangPage from "./pages/dojang/DojangPage";
@@ -233,7 +234,7 @@ type BoardBrowseRouteProps =
 function BoardBrowseRoute(props: BoardBrowseRouteProps) {
   const { data, isLoading, error, retry } = useBoardPosts();
   if (isLoading)
-    return <LoadingState message="게시글 목록을 불러오고 있습니다." />;
+    return <BoardSkeleton view={props.mode} />;
   if (error || !data)
     return (
       <ErrorState
@@ -283,7 +284,7 @@ function PostDetailLoader({
   currentUserId: string | null;
 }) {
   const { data, isLoading, error, retry, updateData } = usePostDetail(postId);
-  if (isLoading) return <LoadingState message="게시글을 불러오고 있습니다." />;
+  if (isLoading) return <BoardSkeleton view="detail" />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
   if (!data)
     return (
