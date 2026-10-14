@@ -16,7 +16,7 @@ type PostDetailPageProps = {
     onUpdateComment?: (id: string, content: string) => void;
     onDeleteComment?: (id: string) => void;
     onLikePost?: (id: string, liked: boolean) => Promise<void>;
-    onDeletePost?: (id: string) => void;
+    onDeletePost?: (id: string) => Promise<void>;
 };
 
 export default function PostDetailPage({
@@ -35,6 +35,9 @@ export default function PostDetailPage({
     const [isLiking, setIsLiking] = useState(false);
     const [likeError, setLikeError] = useState<string | null>(null);
     const likeLock = useRef(false);
+    const deleteLock = useRef(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
     const isActive = useRef(true);
     useEffect(() => {
         isActive.current = true;
@@ -67,16 +70,28 @@ export default function PostDetailPage({
         }
     };
 
-    const handleDelete = () => {
-        if (!onDeletePost) return;
+    const handleDelete = async () => {
+        if (!onDeletePost || !canManagePost || deleteLock.current) return;
         setIsMenuOpen(false);
 
-        const confirmed = window.confirm("게시글을 삭제하시겠습니까?");
+        const confirmed = window.confirm("게시글을 삭제하시겠습니까? 댓글과 공감도 함께 삭제됩니다.");
 
         if (!confirmed) return;
 
-        onDeletePost(post.id);
-        navigate("/");
+        deleteLock.current = true;
+        setIsDeleting(true);
+        setDeleteError(null);
+        try {
+            await onDeletePost(post.id);
+            if (!isActive.current) return;
+            showToast("게시글이 삭제되었습니다.");
+            navigate("/", { replace: true });
+        } catch (error) {
+            if (isActive.current) setDeleteError(error instanceof Error ? error.message : "게시글을 삭제하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            deleteLock.current = false;
+            if (isActive.current) setIsDeleting(false);
+        }
     };
 
     return (
@@ -95,6 +110,8 @@ export default function PostDetailPage({
                                 type="button"
                                 aria-label="게시글 관리"
                                 aria-expanded={isMenuOpen}
+                                aria-busy={isDeleting}
+                                disabled={isDeleting}
                                 title="게시글 관리"
                                 className="flex h-10 w-10 items-center justify-center rounded-full text-kta-muted hover:bg-kta-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kta-navy"
                                 onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -112,8 +129,9 @@ export default function PostDetailPage({
                                     </Link>
                                     {onDeletePost && (
                                         <button
+                                            type="button"
                                             className="px-4 py-3 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
-                                            onClick={handleDelete}
+                                            onClick={() => void handleDelete()}
                                         >
                                             삭제
                                         </button>
@@ -133,7 +151,7 @@ export default function PostDetailPage({
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                     <button
                         type="button"
-                        disabled={isLiking || (Boolean(currentUserId) && !onLikePost)}
+                        disabled={isDeleting || isLiking || (Boolean(currentUserId) && !onLikePost)}
                         aria-pressed={post.isLiked}
                         aria-busy={isLiking}
                         title={post.isLiked ? "공감 취소" : "공감"}
@@ -149,6 +167,8 @@ export default function PostDetailPage({
                     </span>
                 </div>
                 {likeError && <p role="alert" className="mt-2 text-sm text-kta-red">{likeError}</p>}
+                {isDeleting && <p role="status" className="mt-2 text-sm text-kta-muted">삭제 중…</p>}
+                {deleteError && <p role="alert" className="mt-2 text-sm text-kta-red">{deleteError}</p>}
             </article>
 
             <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">

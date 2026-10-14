@@ -12,7 +12,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import MyPage from "./pages/account/MyPage";
 import PostDetailPage from "./pages/board/PostDetailPage";
 import PostEditorPage from "./pages/board/PostEditorPage";
-import { createComment, createPost, setPostLike, updatePost } from "./services/board";
+import { createComment, createPost, deletePost, setPostLike, updatePost } from "./services/board";
 import SearchPage from "./pages/board/SearchPage";
 import SignupPage from "./pages/auth/SignupPage";
 import { useToast } from "./hooks/useToast";
@@ -303,6 +303,10 @@ function PostDetailLoader({
       post={data.post}
       comments={data.comments}
       currentUserId={currentUserId}
+      onDeletePost={async (id) => {
+        if (!currentUserId) throw new Error("로그인이 필요합니다.");
+        await deletePost(id);
+      }}
       onLikePost={async (id, liked) => {
         if (!currentUserId) throw new Error("로그인이 필요합니다.");
         const state = await setPostLike(id, liked);
