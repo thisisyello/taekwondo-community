@@ -8,6 +8,17 @@ const pageSize = 100;
 const postSelect = "id,author_id,board,title,content,view_count,created_at,updated_at,author:profiles!posts_author_id_fkey(id,nickname),comments(count)";
 const commentSelect = "id,post_id,author_id,content,created_at,updated_at,author:profiles!comments_author_id_fkey(id,nickname)";
 
+export async function incrementPostViewCount(postId: string): Promise<number | null> {
+    if (!isPostId(postId)) throw new Error("유효하지 않은 게시글입니다.");
+    const { data, error } = await getSupabase().rpc("increment_post_view_count", { p_post_id: postId });
+    if (error) throw new Error("조회수를 갱신하지 못했습니다.");
+    if (data === null) return null;
+    if (typeof data !== "number" || !Number.isInteger(data) || data < 0) {
+        throw new Error("조회수 응답을 확인하지 못했습니다.");
+    }
+    return data;
+}
+
 export async function createComment(postId: string, form: CommentFormData) {
     if (!isPostId(postId)) throw new Error("유효하지 않은 게시글입니다.");
     const contentError = getCommentContentError(form.content);

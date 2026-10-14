@@ -71,7 +71,7 @@ test("board migration enforces public reads, ownership, protected columns and de
             grant execute on function auth.uid() to anon, authenticated;
             alter default privileges in schema public grant all on tables to anon, authenticated;
         `);
-        for (const filename of ["202610070001_member_profiles.sql", "202610130001_board_posts_comments.sql"]) {
+        for (const filename of ["202610070001_member_profiles.sql", "202610130001_board_posts_comments.sql", "202610140001_post_view_count.sql"]) {
             await db.exec(await readFile(new URL(`../supabase/migrations/${filename}`, import.meta.url), "utf8"));
         }
         for (const [id, nickname] of [[firstId, "First"], [secondId, "Second"]]) {
@@ -128,6 +128,12 @@ test("board migration enforces public reads, ownership, protected columns and de
         await db.exec("reset role; set role anon");
         assert.equal((await db.query("select * from public.posts")).rows.length, 1);
         assert.equal((await db.query("select * from public.comments")).rows.length, 2);
+        const firstView = (await db.query("select public.increment_post_view_count($1) as count", [post.id])).rows[0];
+        assert.equal(firstView.count, 1);
+        assert.equal((await db.query("select public.increment_post_view_count($1) as count", [post.id])).rows[0].count, 2);
+        assert.equal((await db.query("select public.increment_post_view_count($1) as count", [missingId])).rows[0].count, null);
+        assert.equal((await db.query("select updated_at from public.posts where id = $1", [post.id])).rows[0].updated_at.getTime(), changed.updated_at.getTime());
+        await assert.rejects(db.query("update public.posts set view_count = 100 where id = $1", [post.id]));
         await assert.rejects(db.query("insert into public.posts(board, title, content) values ('free', 'Anonymous', 'Anonymous')"));
         await assert.rejects(db.query("insert into public.comments(post_id, content) values ($1, 'Anonymous')", [post.id]));
         await assert.rejects(db.query("update public.posts set title = 'Anonymous'"));
@@ -146,6 +152,7 @@ test("board migration enforces public reads, ownership, protected columns and de
         assert.equal(retainedPost.updated_at.getTime(), changed.updated_at.getTime());
         assert.equal((await db.query("select author_id from public.comments where id = $1", [ownComment.id])).rows[0].author_id, null);
         await asMember(secondId);
+        assert.equal((await db.query("select public.increment_post_view_count($1) as count", [post.id])).rows[0].count, 4);
         assert.equal((await db.query("delete from public.posts where id = $1 returning id", [post.id])).rows.length, 0);
         await db.exec("reset role");
         await db.query("delete from public.posts where id = $1", [post.id]);

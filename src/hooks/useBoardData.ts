@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { getBoardPosts, getPostDetail } from "../services/board";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getBoardPosts, getPostDetail, incrementPostViewCount } from "../services/board";
 
 function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
     const [attempt, setAttempt] = useState(0);
@@ -21,9 +21,9 @@ function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
         setState({ data: null, isLoading: true, error: null });
         setAttempt((value) => value + 1);
     };
-    const updateData = (update: (data: T) => T) => {
+    const updateData = useCallback((update: (data: T) => T) => {
         setState((previous) => previous.data === null ? previous : { ...previous, data: update(previous.data) });
-    };
+    }, []);
     return { ...state, retry, updateData };
 }
 
@@ -31,5 +31,23 @@ export const useBoardPosts = () => useBoardQuery(getBoardPosts);
 
 export function usePostDetail(id: string) {
     const load = useCallback((signal: AbortSignal) => getPostDetail(id, signal), [id]);
-    return useBoardQuery(load);
+    const query = useBoardQuery(load);
+    const viewedPostId = useRef<string | null>(null);
+    const loadedPostId = query.data?.post.id;
+    const { updateData } = query;
+
+    useEffect(() => {
+        if (loadedPostId !== id || viewedPostId.current === id) return;
+        viewedPostId.current = id;
+        void incrementPostViewCount(id).then((count) => {
+            if (count === null) return;
+            updateData((previous) => previous?.post.id === id ? {
+                ...previous, post: { ...previous.post, viewCount: count },
+            } : previous);
+        }).catch(() => {
+            // Counting is best-effort; keep the stored count and the readable post on failure.
+        });
+    }, [id, loadedPostId, updateData]);
+
+    return query;
 }
