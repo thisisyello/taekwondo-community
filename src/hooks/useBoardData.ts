@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getBoardPosts, getPostDetail, incrementPostViewCount } from "../services/board";
+import { getBoardPosts, getPostDetail, getPostForEdit, incrementPostViewCount } from "../services/board";
 
 function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
     const [attempt, setAttempt] = useState(0);
@@ -28,6 +28,11 @@ function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
 }
 
 export const useBoardPosts = () => useBoardQuery(getBoardPosts);
+
+export function usePostForEdit(id: string) {
+    const load = useCallback((signal: AbortSignal) => getPostForEdit(id, signal), [id]);
+    return useBoardQuery(load);
+}
 
 export function usePostDetail(id: string) {
     const load = useCallback((signal: AbortSignal) => getPostDetail(id, signal), [id]);

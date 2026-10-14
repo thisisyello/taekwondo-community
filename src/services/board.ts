@@ -74,6 +74,30 @@ export async function createPost(form: PostFormData): Promise<{ id: string }> {
     return data;
 }
 
+export async function updatePost(postId: string, form: PostFormData): Promise<void> {
+    if (!isPostId(postId)) throw new Error("유효하지 않은 게시글입니다.");
+    const errors = getPostFormErrors(form.title, form.content);
+    if (errors.title || errors.content) throw new Error(errors.title ?? errors.content);
+    const { data, error } = await getSupabase().from("posts")
+        .update({ title: form.title.trim(), content: form.content.trim(), board: form.board })
+        .eq("id", postId).select("id").maybeSingle<{ id: string }>();
+    if (error) {
+        if (["42501", "PGRST301", "PGRST302"].includes(error.code)) {
+            throw new Error("수정 권한이 없거나 로그인이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        throw new Error("게시글을 수정하지 못했습니다. 입력 내용과 연결 상태를 확인하고 다시 시도해주세요.");
+    }
+    if (!data) throw new Error("게시글이 없거나 수정할 권한이 없습니다.");
+}
+
+export async function getPostForEdit(postId: string, signal: AbortSignal) {
+    if (!isPostId(postId)) return null;
+    const { data, error } = await getSupabase().from("posts").select(postSelect)
+        .eq("id", postId).abortSignal(signal).maybeSingle<PostRow>();
+    if (error) throw new Error("게시글을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+    return data ? mapPost(data) : null;
+}
+
 export async function getBoardPosts(signal: AbortSignal) {
     const client = getSupabase();
     const rows: PostRow[] = [];

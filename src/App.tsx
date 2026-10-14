@@ -12,12 +12,12 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import MyPage from "./pages/account/MyPage";
 import PostDetailPage from "./pages/board/PostDetailPage";
 import PostEditorPage from "./pages/board/PostEditorPage";
-import { createComment, createPost, setPostLike } from "./services/board";
+import { createComment, createPost, setPostLike, updatePost } from "./services/board";
 import SearchPage from "./pages/board/SearchPage";
 import SignupPage from "./pages/auth/SignupPage";
 import { useToast } from "./hooks/useToast";
 import { useAuth } from "./hooks/useAuth";
-import { useBoardPosts, usePostDetail } from "./hooks/useBoardData";
+import { useBoardPosts, usePostDetail, usePostForEdit } from "./hooks/useBoardData";
 import { isPostId } from "./utils/boardData";
 import { filterPostsByBoard, sortPosts } from "./utils/postList";
 import type { BoardFilterType, PostSortType } from "./types/board";
@@ -40,7 +40,7 @@ export default function App() {
   const requestedPath: unknown = location.state?.from;
   const detailId =
     typeof requestedPath === "string"
-      ? /^\/posts\/([^/]+)$/.exec(requestedPath)?.[1]
+      ? /^\/posts\/([^/]+)(?:\/edit)?$/.exec(requestedPath)?.[1]
       : undefined;
   const returnTo =
     typeof requestedPath === "string" &&
@@ -209,7 +209,7 @@ export default function App() {
         element={
           currentUser ? (
             <AppLayout title="글 수정" showBackButton>
-              <WriteUnavailable />
+              <PostEditRoute currentUserId={currentUser.id} />
             </AppLayout>
           ) : (
             <LoginRequiredRedirect />
@@ -354,17 +354,28 @@ function ErrorState({
   );
 }
 
-function WriteUnavailable() {
-  return (
-    <section className="flex flex-col items-center gap-4 py-10">
-      <p className="text-sm text-kta-muted">
-        현재 게시글을 저장할 수 없습니다.
-      </p>
-      <Link to="/" className="text-sm font-semibold text-kta-navy">
-        목록으로 돌아가기
-      </Link>
-    </section>
-  );
+function PostEditRoute({ currentUserId }: { currentUserId: string }) {
+  const { postId = "" } = useParams();
+  return <PostEditLoader key={postId} postId={postId} currentUserId={currentUserId} />;
+}
+
+function PostEditLoader({ postId, currentUserId }: { postId: string; currentUserId: string }) {
+  const { data: post, isLoading, error, retry } = usePostForEdit(postId);
+  if (isLoading) return <BoardSkeleton view="detail" />;
+  if (error) return <ErrorState message={error} onRetry={retry} />;
+  if (!post || post.author.id !== currentUserId) {
+    return (
+      <section className="flex flex-col items-center gap-4 py-10">
+        <p role="alert" className="text-sm text-kta-muted">
+          {post ? "작성자만 게시글을 수정할 수 있습니다." : "게시글이 없거나 삭제되었습니다."}
+        </p>
+        <Link to={post ? `/posts/${post.id}` : "/"} replace className="text-sm font-semibold text-kta-navy">
+          {post ? "게시글로 돌아가기" : "목록으로 돌아가기"}
+        </Link>
+      </section>
+    );
+  }
+  return <PostEditorPage key={post.id} mode="edit" post={post} onSubmitPost={(form) => updatePost(post.id, form)} />;
 }
 
 function LoginRequiredRedirect() {

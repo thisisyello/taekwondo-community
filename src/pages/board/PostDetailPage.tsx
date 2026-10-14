@@ -40,7 +40,7 @@ export default function PostDetailPage({
         isActive.current = true;
         return () => { isActive.current = false; };
     }, []);
-    const canManagePost = currentUserId !== null && currentUserId === post.author.id && Boolean(onDeletePost);
+    const canManagePost = currentUserId !== null && currentUserId === post.author.id;
 
     const handleStartEdit = () => {
         setIsMenuOpen(false);
@@ -81,49 +81,47 @@ export default function PostDetailPage({
 
     return (
         <>
-            {canManagePost && (
-                <div className="flex justify-end">
-                    <div className="relative">
-                        <button
-                            className="rounded-full bg-kta-surface px-4 py-2 text-sm font-bold text-kta-navy shadow-kta-sm"
-                            onClick={() => setIsMenuOpen((prev) => !prev)}
-                        >
-                            <FiMoreVertical aria-hidden="true" />
-                        </button>
-
-                        {isMenuOpen && (
-                            <div className="absolute right-0 top-11 z-10 flex min-w-28 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
-                                <Link
-                                    className="px-4 py-3 text-sm font-semibold text-kta-text hover:bg-kta-subtle"
-                                    to={`/posts/${post.id}/edit`}
-                                    onClick={handleStartEdit}
-                                >
-                                    수정
-                                </Link>
-                                <button
-                                    className="px-4 py-3 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
-                                    onClick={handleDelete}
-                                >
-                                    삭제
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
             <article className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
                 <p className="text-xs font-bold text-kta-red">
                     {BOARD_LABELS[post.board]}
                 </p>
                 <div className="mt-2 flex items-start justify-between gap-3">
-                    <h1 className="min-w-0 text-2xl font-black leading-tight text-kta-text">
+                    <h1 className="min-w-0 flex-1 break-words text-2xl font-black leading-tight text-kta-text [overflow-wrap:anywhere]">
                         {post.title}
                     </h1>
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-kta-subtle px-3 py-1 text-sm font-bold text-kta-navy">
-                        <FiEye aria-hidden="true" />
-                        조회 {post.viewCount}
-                    </span>
+                    {canManagePost && (
+                        <div className="relative shrink-0">
+                            <button
+                                type="button"
+                                aria-label="게시글 관리"
+                                aria-expanded={isMenuOpen}
+                                title="게시글 관리"
+                                className="flex h-10 w-10 items-center justify-center rounded-full text-kta-muted hover:bg-kta-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kta-navy"
+                                onClick={() => setIsMenuOpen((prev) => !prev)}
+                            >
+                                <FiMoreVertical aria-hidden="true" className="text-xl" />
+                            </button>
+                            {isMenuOpen && (
+                                <div className="absolute right-0 top-11 z-10 flex min-w-28 flex-col overflow-hidden rounded-kta-md border border-kta-border bg-kta-surface shadow-kta-md">
+                                    <Link
+                                        className="px-4 py-3 text-sm font-semibold text-kta-text hover:bg-kta-subtle"
+                                        to={`/posts/${post.id}/edit`}
+                                        onClick={handleStartEdit}
+                                    >
+                                        수정
+                                    </Link>
+                                    {onDeletePost && (
+                                        <button
+                                            className="px-4 py-3 text-left text-sm font-semibold text-kta-red hover:bg-red-50"
+                                            onClick={handleDelete}
+                                        >
+                                            삭제
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <p className="mt-3 text-sm text-kta-muted">
                     {post.author.nickname} · {formatDate(post.createdAt)}
@@ -132,18 +130,24 @@ export default function PostDetailPage({
                 <p className="mt-6 whitespace-pre-wrap text-base leading-8 text-kta-text">
                     {post.content}
                 </p>
-                <button
-                    type="button"
-                    disabled={isLiking || (Boolean(currentUserId) && !onLikePost)}
-                    aria-pressed={post.isLiked}
-                    aria-busy={isLiking}
-                    title={post.isLiked ? "공감 취소" : "공감"}
-                    className={`mt-6 inline-flex h-10 min-w-24 items-center justify-center gap-1 rounded-full px-4 text-sm font-bold disabled:cursor-wait disabled:opacity-60 ${post.isLiked ? "bg-kta-red text-white" : "bg-red-50 text-kta-red"}`}
-                    onClick={() => void handleLike()}
-                >
-                    <FiHeart aria-hidden="true" fill={post.isLiked ? "currentColor" : "none"} /> 공감{" "}
-                    {post.likeCount}
-                </button>
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <button
+                        type="button"
+                        disabled={isLiking || (Boolean(currentUserId) && !onLikePost)}
+                        aria-pressed={post.isLiked}
+                        aria-busy={isLiking}
+                        title={post.isLiked ? "공감 취소" : "공감"}
+                        className={`inline-flex h-10 min-w-24 items-center justify-center gap-1 rounded-full px-4 text-sm font-bold disabled:cursor-wait disabled:opacity-60 ${post.isLiked ? "bg-kta-red text-white" : "bg-red-50 text-kta-red"}`}
+                        onClick={() => void handleLike()}
+                    >
+                        <FiHeart aria-hidden="true" fill={post.isLiked ? "currentColor" : "none"} /> 공감{" "}
+                        {post.likeCount}
+                    </button>
+                    <span className="inline-flex h-10 shrink-0 items-center gap-1 rounded-full bg-kta-subtle px-3 text-sm font-bold text-kta-navy">
+                        <FiEye aria-hidden="true" />
+                        조회 {post.viewCount}
+                    </span>
+                </div>
                 {likeError && <p role="alert" className="mt-2 text-sm text-kta-red">{likeError}</p>}
             </article>
 

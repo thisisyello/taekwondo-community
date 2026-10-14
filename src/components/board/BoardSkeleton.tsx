@@ -15,7 +15,7 @@ export default function BoardSkeleton({ view }: BoardSkeletonProps) {
                             <Placeholder className="h-4 w-20" />
                             <div className="mt-2 flex items-start justify-between gap-3">
                                 <Placeholder className="h-8 w-3/4" />
-                                <Placeholder className="h-7 w-16 shrink-0" />
+                                <Placeholder className="h-10 w-10 shrink-0" />
                             </div>
                             <Placeholder className="mt-3 h-5 w-40 max-w-full" />
                             <div className="mt-6 flex flex-col gap-3">
@@ -24,7 +24,10 @@ export default function BoardSkeleton({ view }: BoardSkeletonProps) {
                                 <Placeholder className="h-5 w-4/5" />
                                 <Placeholder className="h-5 w-2/3" />
                             </div>
-                            <Placeholder className="mt-6 h-9 w-24" />
+                            <div className="mt-6 flex items-center gap-3">
+                                <Placeholder className="h-10 w-24" />
+                                <Placeholder className="h-10 w-24" />
+                            </div>
                         </div>
                         <div className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
                             <Placeholder className="h-7 w-20" />
