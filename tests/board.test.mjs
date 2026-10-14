@@ -36,6 +36,9 @@ test("board rows map UUIDs, deleted authors, dates and stored counts to UI data"
     assert.equal(post.id, id);
     assert.equal(post.viewCount, 12);
     assert.equal(post.likeCount, 0);
+    assert.equal(post.isLiked, false);
+    assert.equal(mapPost(row, { post_id: id, like_count: 3, is_liked: true }).likeCount, 3);
+    assert.equal(mapPost(row, { post_id: id, like_count: 3, is_liked: true }).isLiked, true);
     assert.equal(post.author.nickname, "Member");
     assert.deepEqual(mapPost({ ...row, author_id: null, author: null }).author, { id: null, nickname: "탈퇴한 회원" });
     assert.equal(mapComment({ ...row, post_id: id }).postId, id);

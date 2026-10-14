@@ -40,8 +40,8 @@ export default function PostItem({ post, commentCount }: PostItemProps) {
                             <FiMessageCircle aria-hidden="true" />
                             댓글 {commentCount}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-kta-red">
-                            <FiHeart aria-hidden="true" />
+                        <span className="inline-flex items-center gap-1 text-kta-red" title={post.isLiked ? "내가 공감한 게시글" : "공감 수"}>
+                            <FiHeart aria-hidden="true" fill={post.isLiked ? "currentColor" : "none"} />
                             공감 {post.likeCount}
                         </span>
                     </div>

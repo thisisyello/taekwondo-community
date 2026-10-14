@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiEye, FiHeart, FiLogIn, FiMoreVertical } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import CommentForm from "../../components/board/CommentForm";
@@ -15,7 +15,7 @@ type PostDetailPageProps = {
     onAddComment?: (postId: string, comment: CommentFormData) => Promise<void>;
     onUpdateComment?: (id: string, content: string) => void;
     onDeleteComment?: (id: string) => void;
-    onLikePost?: (id: string) => void;
+    onLikePost?: (id: string, liked: boolean) => Promise<void>;
     onDeletePost?: (id: string) => void;
 };
 
@@ -32,10 +32,39 @@ export default function PostDetailPage({
     const navigate = useNavigate();
     const showToast = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLiking, setIsLiking] = useState(false);
+    const [likeError, setLikeError] = useState<string | null>(null);
+    const likeLock = useRef(false);
+    const isActive = useRef(true);
+    useEffect(() => {
+        isActive.current = true;
+        return () => { isActive.current = false; };
+    }, []);
     const canManagePost = currentUserId !== null && currentUserId === post.author.id && Boolean(onDeletePost);
 
     const handleStartEdit = () => {
         setIsMenuOpen(false);
+    };
+
+    const handleLike = async () => {
+        if (likeLock.current) return;
+        if (!currentUserId) {
+            showToast("로그인이 필요한 서비스입니다.");
+            navigate("/login", { state: { from: `/posts/${post.id}` } });
+            return;
+        }
+        if (!onLikePost) return;
+        likeLock.current = true;
+        setIsLiking(true);
+        setLikeError(null);
+        try {
+            await onLikePost(post.id, !post.isLiked);
+        } catch (error) {
+            if (isActive.current) setLikeError(error instanceof Error ? error.message : "공감을 저장하지 못했습니다. 다시 시도해주세요.");
+        } finally {
+            likeLock.current = false;
+            if (isActive.current) setIsLiking(false);
+        }
     };
 
     const handleDelete = () => {
@@ -104,25 +133,18 @@ export default function PostDetailPage({
                     {post.content}
                 </p>
                 <button
-                    disabled={Boolean(currentUserId) && !onLikePost}
-                    title={currentUserId && !onLikePost ? "현재 공감할 수 없습니다." : undefined}
-                    className="mt-6 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-kta-red"
-                    onClick={() => {
-                        if (!currentUserId) {
-                            showToast("로그인이 필요한 서비스입니다.");
-                            navigate("/login", {
-                                state: {
-                                    from: `/posts/${post.id}`,
-                                },
-                            });
-                            return;
-                        }
-                        onLikePost?.(post.id);
-                    }}
+                    type="button"
+                    disabled={isLiking || (Boolean(currentUserId) && !onLikePost)}
+                    aria-pressed={post.isLiked}
+                    aria-busy={isLiking}
+                    title={post.isLiked ? "공감 취소" : "공감"}
+                    className={`mt-6 inline-flex h-10 min-w-24 items-center justify-center gap-1 rounded-full px-4 text-sm font-bold disabled:cursor-wait disabled:opacity-60 ${post.isLiked ? "bg-kta-red text-white" : "bg-red-50 text-kta-red"}`}
+                    onClick={() => void handleLike()}
                 >
-                    <FiHeart aria-hidden="true" className="inline" /> 공감{" "}
+                    <FiHeart aria-hidden="true" fill={post.isLiked ? "currentColor" : "none"} /> 공감{" "}
                     {post.likeCount}
                 </button>
+                {likeError && <p role="alert" className="mt-2 text-sm text-kta-red">{likeError}</p>}
             </article>
 
             <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">

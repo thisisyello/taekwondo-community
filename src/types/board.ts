@@ -49,6 +49,7 @@ export type Post = {
     author: BoardAuthor;
     board: BoardType;
     likeCount: number;
+    isLiked: boolean;
     viewCount: number;
     createdAt: string;
     updatedAt: string;
@@ -56,7 +57,7 @@ export type Post = {
 
 export type PostFormData = Omit<
     Post,
-    "id" | "author" | "likeCount" | "viewCount" | "createdAt" | "updatedAt"
+    "id" | "author" | "likeCount" | "isLiked" | "viewCount" | "createdAt" | "updatedAt"
 >;
 
 export type Comment = {
