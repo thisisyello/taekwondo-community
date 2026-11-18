@@ -6,7 +6,7 @@ import { getCommentContentError, getPostFormErrors } from "../utils/boardValidat
 
 const pageSize = 100;
 const postSelect = "id,author_id,board,title,content,view_count,created_at,updated_at,author:profiles!posts_author_id_fkey(id,nickname),comments(count)";
-const commentSelect = "id,post_id,author_id,content,created_at,updated_at,author:profiles!comments_author_id_fkey(id,nickname)";
+const commentSelect = "id,post_id,parent_id,author_id,content,created_at,updated_at,author:profiles!comments_author_id_fkey(id,nickname)";
 
 async function getLikeStates(ids: string[], signal: AbortSignal) {
     if (ids.length === 0) return new Map<string, PostLikeState>();
@@ -42,21 +42,51 @@ export async function incrementPostViewCount(postId: string): Promise<number | n
     return data;
 }
 
-export async function createComment(postId: string, form: CommentFormData) {
+export async function createComment(postId: string, form: CommentFormData, parentId: string | null = null) {
     if (!isPostId(postId)) throw new Error("유효하지 않은 게시글입니다.");
+    if (parentId !== null && !isPostId(parentId)) throw new Error("유효하지 않은 상위 댓글입니다.");
     const contentError = getCommentContentError(form.content);
     if (contentError) throw new Error(contentError);
     const { data, error } = await getSupabase().from("comments")
-        .insert({ post_id: postId, content: form.content.trim() })
+        .insert({ post_id: postId, parent_id: parentId, content: form.content.trim() })
         .select(commentSelect).single<CommentRow>();
     if (error) {
-        if (error.code === "23503") throw new Error("게시글이 없거나 삭제되었습니다.");
+        if (error.code === "23503") throw new Error("게시글 또는 상위 댓글이 없거나 삭제되었습니다.");
         if (["42501", "PGRST301", "PGRST302"].includes(error.code)) {
             throw new Error("댓글을 작성할 권한이 없거나 로그인이 만료되었습니다. 다시 로그인해주세요.");
         }
         throw new Error("댓글을 저장하지 못했습니다. 연결 상태를 확인하고 다시 시도해주세요.");
     }
     return mapComment(data);
+}
+
+export async function updateComment(commentId: string, content: string) {
+    if (!isPostId(commentId)) throw new Error("유효하지 않은 댓글입니다.");
+    const contentError = getCommentContentError(content);
+    if (contentError) throw new Error(contentError);
+    const { data, error } = await getSupabase().from("comments")
+        .update({ content: content.trim() }).eq("id", commentId).select(commentSelect).maybeSingle<CommentRow>();
+    if (error) {
+        if (["42501", "PGRST301", "PGRST302"].includes(error.code)) {
+            throw new Error("수정 권한이 없거나 로그인이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        throw new Error("댓글을 수정하지 못했습니다. 잠시 후 다시 시도해주세요.");
+    }
+    if (!data) throw new Error("댓글이 삭제되었거나 수정할 권한이 없습니다.");
+    return mapComment(data);
+}
+
+export async function deleteComment(commentId: string): Promise<void> {
+    if (!isPostId(commentId)) throw new Error("유효하지 않은 댓글입니다.");
+    const { data, error } = await getSupabase().from("comments")
+        .delete().eq("id", commentId).select("id").maybeSingle<{ id: string }>();
+    if (error) {
+        if (["42501", "PGRST301", "PGRST302"].includes(error.code)) {
+            throw new Error("삭제 권한이 없거나 로그인이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        throw new Error("댓글을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.");
+    }
+    if (!data) throw new Error("댓글이 삭제되었거나 삭제할 권한이 없습니다.");
 }
 
 export async function createPost(form: PostFormData): Promise<{ id: string }> {
