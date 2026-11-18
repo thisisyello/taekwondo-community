@@ -12,9 +12,9 @@ type PostDetailPageProps = {
     post: Post;
     comments: Comment[];
     currentUserId: string | null;
-    onAddComment?: (postId: string, comment: CommentFormData) => Promise<void>;
-    onUpdateComment?: (id: string, content: string) => void;
-    onDeleteComment?: (id: string) => void;
+    onAddComment?: (postId: string, comment: CommentFormData, parentId?: string | null) => Promise<void>;
+    onUpdateComment?: (id: string, content: string) => Promise<void>;
+    onDeleteComment?: (id: string) => Promise<void>;
     onLikePost?: (id: string, liked: boolean) => Promise<void>;
     onDeletePost?: (id: string) => Promise<void>;
 };
@@ -199,6 +199,7 @@ export default function PostDetailPage({
                         currentUserId={currentUserId}
                         onUpdateComment={onUpdateComment}
                         onDeleteComment={onDeleteComment}
+                        onAddReply={onAddComment ? (parentId, form) => onAddComment(post.id, form, parentId) : undefined}
                     />
                 </div>
             </section>

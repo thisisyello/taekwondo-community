@@ -1,11 +1,13 @@
-import type { Comment } from "../../types/board";
+import type { Comment, CommentFormData } from "../../types/board";
 import CommentItem from "./CommentItem";
+import { flattenCommentThreads } from "../../utils/commentThreads";
 
 type CommentListProps = {
     comments: Comment[];
     currentUserId: string | null;
-    onUpdateComment?: (id: string, content: string) => void;
-    onDeleteComment?: (id: string) => void;
+    onUpdateComment?: (id: string, content: string) => Promise<void>;
+    onDeleteComment?: (id: string) => Promise<void>;
+    onAddReply?: (parentId: string, form: CommentFormData) => Promise<void>;
 };
 
 export default function CommentList({
@@ -13,6 +15,7 @@ export default function CommentList({
     currentUserId,
     onUpdateComment,
     onDeleteComment,
+    onAddReply,
 }: CommentListProps) {
     if (comments.length === 0) {
         return <p className="text-sm text-kta-muted">댓글이 없습니다.</p>;
@@ -20,13 +23,16 @@ export default function CommentList({
 
     return (
         <ul className="flex flex-col divide-y divide-kta-border">
-            {comments.map((comment) => (
+            {flattenCommentThreads(comments).map(({ comment, depth, parentAuthor }) => (
                 <CommentItem
                     key={comment.id}
                     comment={comment}
                     currentUserId={currentUserId}
                     onUpdateComment={onUpdateComment}
                     onDeleteComment={onDeleteComment}
+                    depth={depth}
+                    parentAuthor={parentAuthor}
+                    onAddReply={onAddReply}
                 />
             ))}
         </ul>

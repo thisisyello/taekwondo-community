@@ -12,7 +12,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import MyPage from "./pages/account/MyPage";
 import PostDetailPage from "./pages/board/PostDetailPage";
 import PostEditorPage from "./pages/board/PostEditorPage";
-import { createComment, createPost, deletePost, setPostLike, updatePost } from "./services/board";
+import { createComment, createPost, deleteComment, deletePost, setPostLike, updateComment, updatePost } from "./services/board";
 import SearchPage from "./pages/board/SearchPage";
 import SignupPage from "./pages/auth/SignupPage";
 import { useToast } from "./hooks/useToast";
@@ -20,6 +20,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useBoardPosts, usePostDetail, usePostForEdit } from "./hooks/useBoardData";
 import { isPostId } from "./utils/boardData";
 import { filterPostsByBoard, sortPosts } from "./utils/postList";
+import { removeCommentBranch } from "./utils/commentThreads";
 import type { BoardFilterType, PostSortType } from "./types/board";
 
 export default function App() {
@@ -314,10 +315,24 @@ function PostDetailLoader({
           ...previous, post: { ...previous.post, likeCount: state.like_count, isLiked: state.is_liked },
         } : previous);
       }}
-      onAddComment={async (id, form) => {
+      onUpdateComment={async (id, content) => {
         if (!currentUserId) throw new Error("로그인이 필요합니다.");
-        const comment = await createComment(id, form);
+        const comment = await updateComment(id, content);
         updateData((previous) => previous ? {
+          ...previous, comments: previous.comments.map((item) => item.id === id ? comment : item),
+        } : previous);
+      }}
+      onDeleteComment={async (id) => {
+        if (!currentUserId) throw new Error("로그인이 필요합니다.");
+        await deleteComment(id);
+        updateData((previous) => previous ? {
+          ...previous, comments: removeCommentBranch(previous.comments, id),
+        } : previous);
+      }}
+      onAddComment={async (id, form, parentId = null) => {
+        if (!currentUserId) throw new Error("로그인이 필요합니다.");
+        const comment = await createComment(id, form, parentId);
+        updateData((previous) => previous && (!comment.parentId || previous.comments.some((item) => item.id === comment.parentId)) ? {
           ...previous,
           comments: [...previous.comments, comment].sort((first, second) =>
             Date.parse(first.createdAt) - Date.parse(second.createdAt) || first.id.localeCompare(second.id)),
