@@ -63,6 +63,7 @@ export type PostFormData = Omit<
 export type Comment = {
     id: string;
     postId: string;
+    parentId: string | null;
     content: string;
     author: BoardAuthor;
     createdAt: string;
@@ -71,5 +72,5 @@ export type Comment = {
 
 export type CommentFormData = Omit<
     Comment,
-    "id" | "postId" | "author" | "createdAt" | "updatedAt"
+    "id" | "postId" | "parentId" | "author" | "createdAt" | "updatedAt"
 >;

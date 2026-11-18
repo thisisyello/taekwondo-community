@@ -30,6 +30,7 @@ export type PostRow = {
 export type CommentRow = {
     id: string;
     post_id: string;
+    parent_id: string | null;
     author_id: string | null;
     content: string;
     created_at: string;
@@ -61,6 +62,7 @@ export function mapComment(row: CommentRow): Comment {
     return {
         id: row.id,
         postId: row.post_id,
+        parentId: row.parent_id ?? null,
         author: mapAuthor(row.author_id, row.author),
         content: row.content,
         createdAt: row.created_at,

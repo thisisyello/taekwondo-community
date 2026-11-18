@@ -192,6 +192,7 @@ export const initialComments: Comment[] = [
     {
         id: "1",
         postId: "1",
+        parentId: null,
         content: "저희 아이는 와이어 줄넘기를 쓰고 있어요.",
         author: createAuthor("user-parent-2", "학부모2"),
         createdAt: "2026-05-20T10:00:00.000Z",
@@ -200,6 +201,7 @@ export const initialComments: Comment[] = [
     {
         id: "2",
         postId: "2",
+        parentId: null,
         content: "상담 전에 질문 목록을 적어가면 좋더라고요.",
         author: createAuthor("user-parent-3", "학부모3"),
         createdAt: "2026-05-21T13:20:00.000Z",
@@ -208,6 +210,7 @@ export const initialComments: Comment[] = [
     {
         id: "3",
         postId: "4",
+        parentId: null,
         content: "영상으로 찍어서 아이와 같이 보면 방향을 잡는 데 도움이 됐어요.",
         author: createAuthor("user-parent-9", "학부모9"),
         createdAt: "2026-05-23T09:00:00.000Z",
@@ -216,6 +219,7 @@ export const initialComments: Comment[] = [
     {
         id: "4",
         postId: "5",
+        parentId: null,
         content: "보호대는 통풍이 정말 중요하더라고요.",
         author: createAuthor("user-staff-3", "지도진3"),
         createdAt: "2026-05-24T12:20:00.000Z",
@@ -224,6 +228,7 @@ export const initialComments: Comment[] = [
     {
         id: "5",
         postId: "5",
+        parentId: null,
         content: "세탁망에 넣어서 약하게 돌리는 것도 괜찮았습니다.",
         author: createAuthor("user-parent-10", "학부모10"),
         createdAt: "2026-05-24T15:10:00.000Z",
@@ -232,6 +237,7 @@ export const initialComments: Comment[] = [
     {
         id: "6",
         postId: "7",
+        parentId: null,
         content: "매일 조금씩 다리 찢기보다 고관절을 먼저 풀어보세요.",
         author: createAuthor("user-coach-3", "사범님3"),
         createdAt: "2026-05-26T10:30:00.000Z",
@@ -240,6 +246,7 @@ export const initialComments: Comment[] = [
     {
         id: "7",
         postId: "7",
+        parentId: null,
         content: "무리해서 올리면 허리가 꺾일 수 있어서 천천히 하는 게 좋습니다.",
         author: createAuthor("user-staff-4", "지도진4"),
         createdAt: "2026-05-26T11:05:00.000Z",
@@ -248,6 +255,7 @@ export const initialComments: Comment[] = [
     {
         id: "8",
         postId: "8",
+        parentId: null,
         content: "저희 아이도 친구 덕분에 빠지지 않고 다니고 있어요.",
         author: createAuthor("user-parent-11", "학부모11"),
         createdAt: "2026-05-27T18:15:00.000Z",
@@ -256,6 +264,7 @@ export const initialComments: Comment[] = [
     {
         id: "9",
         postId: "10",
+        parentId: null,
         content: "처음에는 거울 앞에서 천천히 묶어보면 좋아요.",
         author: createAuthor("user-student-6", "관원생6"),
         createdAt: "2026-05-29T14:00:00.000Z",
@@ -264,6 +273,7 @@ export const initialComments: Comment[] = [
     {
         id: "10",
         postId: "11",
+        parentId: null,
         content: "성취감을 느낀 게 제일 큰 변화 같아요.",
         author: createAuthor("user-parent-12", "학부모12"),
         createdAt: "2026-05-30T11:30:00.000Z",
@@ -272,6 +282,7 @@ export const initialComments: Comment[] = [
     {
         id: "11",
         postId: "11",
+        parentId: null,
         content: "다음 목표를 같이 정해주면 동기부여가 이어지더라고요.",
         author: createAuthor("user-coach-4", "사범님4"),
         createdAt: "2026-05-30T13:20:00.000Z",
@@ -280,6 +291,7 @@ export const initialComments: Comment[] = [
     {
         id: "12",
         postId: "12",
+        parentId: null,
         content: "저는 구간을 나눠서 외우니까 훨씬 편했습니다.",
         author: createAuthor("user-student-7", "관원생7"),
         createdAt: "2026-05-31T19:10:00.000Z",
@@ -288,6 +300,7 @@ export const initialComments: Comment[] = [
     {
         id: "13",
         postId: "13",
+        parentId: null,
         content: "통증이 반복되면 쉬는 날에도 확인해보는 게 좋을 것 같아요.",
         author: createAuthor("user-parent-13", "학부모13"),
         createdAt: "2026-06-01T13:15:00.000Z",
@@ -296,6 +309,7 @@ export const initialComments: Comment[] = [
     {
         id: "14",
         postId: "15",
+        parentId: null,
         content: "짧은 성공 경험을 주는 방식에 공감합니다.",
         author: createAuthor("user-staff-5", "지도진5"),
         createdAt: "2026-06-03T10:30:00.000Z",
