@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useParams } from "react-router";
 import AppLayout from "./components/layout/AppLayout";
 import BoardSkeleton from "./components/board/BoardSkeleton";
+import AuthNotice from "./components/common/AuthNotice";
 import BoardPage from "./pages/board/BoardPage";
 import ChatsPage from "./pages/chat/ChatsPage";
 import DojangPage from "./pages/dojang/DojangPage";
@@ -21,6 +22,7 @@ import { useBoardPosts, usePostDetail, usePostForEdit } from "./hooks/useBoardDa
 import { isPostId } from "./utils/boardData";
 import { filterPostsByBoard, sortPosts } from "./utils/postList";
 import { removeCommentBranch } from "./utils/commentThreads";
+import { isPublicRoute } from "./utils/authRoutes";
 import type { BoardFilterType, PostSortType } from "./types/board";
 
 export default function App() {
@@ -30,6 +32,7 @@ export default function App() {
     isLoading: isAuthLoading,
     error: authError,
     recoveryUserId,
+    retry: retryAuth,
     signIn,
     signUp,
     signOut,
@@ -50,10 +53,17 @@ export default function App() {
       ? requestedPath
       : "/";
 
-  if (isAuthLoading) {
+  const isAuthPending = isAuthLoading || authError !== null;
+  const viewerId = isAuthPending ? null : currentUser?.id ?? null;
+  const handleLogout = () => {
+    void signOut().catch(() => showToast("로그아웃하지 못했습니다. 다시 시도해주세요."));
+  };
+  const authNotice = authError ? <AuthNotice message={authError} onRetry={retryAuth} onLogout={handleLogout} /> : null;
+
+  if (!isPublicRoute(location.pathname) && isAuthLoading) {
     return <LoadingState message="로그인 정보를 확인하고 있습니다." />;
   }
-  if (authError && location.pathname !== "/reset-password") {
+  if (authError && !isPublicRoute(location.pathname) && location.pathname !== "/reset-password") {
     return (
       <section className="flex min-h-svh flex-col items-center justify-center gap-4 bg-kta-bg px-4 text-center">
         <p role="alert" className="text-sm text-kta-red">
@@ -61,7 +71,7 @@ export default function App() {
         </p>
         <button
           className="rounded-kta-sm bg-kta-navy px-4 py-3 text-sm font-bold text-white"
-          onClick={() => window.location.reload()}
+          onClick={retryAuth}
         >
           다시 시도
         </button>
@@ -126,9 +136,11 @@ export default function App() {
       <Route
         path="/"
         element={
-          <AppLayout title="태권도 커뮤니티" showSearchButton>
+          <AppLayout title="태권도 커뮤니티" showSearchButton authNotice={authNotice}>
             <BoardBrowseRoute
               mode="list"
+              viewerId={viewerId}
+              isAuthPending={isAuthPending}
               selectedBoardType={selectedBoardType}
               onSelectBoardType={setSelectedBoardType}
               postSortType={postSortType}
@@ -140,15 +152,15 @@ export default function App() {
       <Route
         path="/search"
         element={
-          <AppLayout title="검색" showBackButton>
-            <BoardBrowseRoute mode="search" />
+          <AppLayout title="검색" showBackButton authNotice={authNotice}>
+            <BoardBrowseRoute mode="search" viewerId={viewerId} isAuthPending={isAuthPending} />
           </AppLayout>
         }
       />
       <Route
         path="/dojang"
         element={
-          <AppLayout title="찾기">
+          <AppLayout title="찾기" authNotice={authNotice}>
             <DojangPage />
           </AppLayout>
         }
@@ -200,8 +212,8 @@ export default function App() {
       <Route
         path="/posts/:postId"
         element={
-          <AppLayout title="게시글" showBackButton>
-            <PostDetailRoute currentUserId={currentUser?.id ?? null} />
+          <AppLayout title="게시글" showBackButton authNotice={authNotice}>
+            <PostDetailRoute currentUserId={viewerId} isAuthPending={isAuthPending} />
           </AppLayout>
         }
       />
@@ -222,7 +234,7 @@ export default function App() {
   );
 }
 
-type BoardBrowseRouteProps =
+type BoardBrowseRouteProps = { viewerId: string | null; isAuthPending: boolean } & (
   | { mode: "search" }
   | {
       mode: "list";
@@ -230,10 +242,10 @@ type BoardBrowseRouteProps =
       onSelectBoardType: (board: BoardFilterType) => void;
       postSortType: PostSortType;
       onChangePostSortType: (sort: PostSortType) => void;
-    };
+    });
 
 function BoardBrowseRoute(props: BoardBrowseRouteProps) {
-  const { data, isLoading, error, retry } = useBoardPosts();
+  const { data, isLoading, error, retry } = useBoardPosts(props.viewerId);
   if (isLoading)
     return <BoardSkeleton view={props.mode} />;
   if (error || !data)
@@ -262,17 +274,19 @@ function BoardBrowseRoute(props: BoardBrowseRouteProps) {
       onChangePostSortType={props.onChangePostSortType}
       selectedBoardType={props.selectedBoardType}
       onSelectBoardType={props.onSelectBoardType}
+      isAuthPending={props.isAuthPending}
     />
   );
 }
 
-function PostDetailRoute({ currentUserId }: { currentUserId: string | null }) {
+function PostDetailRoute({ currentUserId, isAuthPending }: { currentUserId: string | null; isAuthPending: boolean }) {
   const { postId = "" } = useParams();
   return (
     <PostDetailLoader
       key={postId}
       postId={postId}
       currentUserId={currentUserId}
+      isAuthPending={isAuthPending}
     />
   );
 }
@@ -280,11 +294,13 @@ function PostDetailRoute({ currentUserId }: { currentUserId: string | null }) {
 function PostDetailLoader({
   postId,
   currentUserId,
+  isAuthPending,
 }: {
   postId: string;
   currentUserId: string | null;
+  isAuthPending: boolean;
 }) {
-  const { data, isLoading, error, retry, updateData } = usePostDetail(postId);
+  const { data, isLoading, error, retry, updateData, isLikeLoading, likeStateError, retryLikeState, updateLikeState } = usePostDetail(postId, currentUserId);
   if (isLoading) return <BoardSkeleton view="detail" />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
   if (!data)
@@ -300,17 +316,22 @@ function PostDetailLoader({
     );
   return (
     <PostDetailPage
-      key={data.post.id}
+      key={`${data.post.id}:${currentUserId ?? "guest"}`}
       post={data.post}
       comments={data.comments}
       currentUserId={currentUserId}
+      isAuthPending={isAuthPending}
+      isLikeLoading={isLikeLoading}
+      likeStateError={likeStateError}
+      onRetryLikeState={retryLikeState}
       onDeletePost={async (id) => {
         if (!currentUserId) throw new Error("로그인이 필요합니다.");
         await deletePost(id);
       }}
       onLikePost={async (id, liked) => {
-        if (!currentUserId) throw new Error("로그인이 필요합니다.");
+        if (isAuthPending || !currentUserId || isLikeLoading || likeStateError) throw new Error("로그인 및 공감 상태 확인 후 다시 시도해주세요.");
         const state = await setPostLike(id, liked);
+        updateLikeState(state);
         updateData((previous) => previous ? {
           ...previous, post: { ...previous.post, likeCount: state.like_count, isLiked: state.is_liked },
         } : previous);

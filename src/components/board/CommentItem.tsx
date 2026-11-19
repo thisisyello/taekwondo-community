@@ -10,6 +10,7 @@ import CommentForm from "./CommentForm";
 type CommentItemProps = {
     comment: Comment;
     currentUserId: string | null;
+    isAuthPending?: boolean;
     depth: number;
     parentAuthor: string | null;
     onUpdateComment?: (id: string, content: string) => Promise<void>;
@@ -18,7 +19,7 @@ type CommentItemProps = {
 };
 
 export default function CommentItem({
-    comment, currentUserId, depth, parentAuthor, onUpdateComment, onDeleteComment, onAddReply,
+    comment, currentUserId, isAuthPending = false, depth, parentAuthor, onUpdateComment, onDeleteComment, onAddReply,
 }: CommentItemProps) {
     const navigate = useNavigate();
     const showToast = useToast();
@@ -80,6 +81,7 @@ export default function CommentItem({
     };
 
     const handleReply = () => {
+        if (isAuthPending) return;
         if (!currentUserId) {
             showToast("로그인이 필요한 서비스입니다.");
             navigate("/login", { state: { from: `/posts/${comment.postId}` } });
@@ -154,7 +156,7 @@ export default function CommentItem({
             {pending === "delete" && <p role="status" className="mt-2 text-sm text-kta-muted">삭제 중…</p>}
             {submitError && <p role="alert" className="mt-2 text-sm text-kta-red">{submitError}</p>}
             {!isEditing && onAddReply && (
-                <button type="button" disabled={pending !== null} aria-expanded={isReplying}
+                <button type="button" disabled={isAuthPending || pending !== null} aria-expanded={isReplying}
                     onClick={handleReply} className="mt-1 inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-kta-muted disabled:opacity-60">
                     <FiMessageCircle aria-hidden="true" />답글
                 </button>

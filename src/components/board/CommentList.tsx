@@ -5,6 +5,7 @@ import { flattenCommentThreads } from "../../utils/commentThreads";
 type CommentListProps = {
     comments: Comment[];
     currentUserId: string | null;
+    isAuthPending?: boolean;
     onUpdateComment?: (id: string, content: string) => Promise<void>;
     onDeleteComment?: (id: string) => Promise<void>;
     onAddReply?: (parentId: string, form: CommentFormData) => Promise<void>;
@@ -13,6 +14,7 @@ type CommentListProps = {
 export default function CommentList({
     comments,
     currentUserId,
+    isAuthPending = false,
     onUpdateComment,
     onDeleteComment,
     onAddReply,
@@ -28,6 +30,7 @@ export default function CommentList({
                     key={comment.id}
                     comment={comment}
                     currentUserId={currentUserId}
+                    isAuthPending={isAuthPending}
                     onUpdateComment={onUpdateComment}
                     onDeleteComment={onDeleteComment}
                     depth={depth}

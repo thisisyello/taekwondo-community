@@ -12,6 +12,10 @@ type PostDetailPageProps = {
     post: Post;
     comments: Comment[];
     currentUserId: string | null;
+    isAuthPending?: boolean;
+    isLikeLoading?: boolean;
+    likeStateError?: string | null;
+    onRetryLikeState?: () => void;
     onAddComment?: (postId: string, comment: CommentFormData, parentId?: string | null) => Promise<void>;
     onUpdateComment?: (id: string, content: string) => Promise<void>;
     onDeleteComment?: (id: string) => Promise<void>;
@@ -23,6 +27,10 @@ export default function PostDetailPage({
     post,
     comments,
     currentUserId,
+    isAuthPending = false,
+    isLikeLoading = false,
+    likeStateError,
+    onRetryLikeState,
     onAddComment,
     onUpdateComment,
     onDeleteComment,
@@ -50,7 +58,7 @@ export default function PostDetailPage({
     };
 
     const handleLike = async () => {
-        if (likeLock.current) return;
+        if (likeLock.current || isAuthPending || isLikeLoading || likeStateError) return;
         if (!currentUserId) {
             showToast("로그인이 필요한 서비스입니다.");
             navigate("/login", { state: { from: `/posts/${post.id}` } });
@@ -151,9 +159,9 @@ export default function PostDetailPage({
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                     <button
                         type="button"
-                        disabled={isDeleting || isLiking || (Boolean(currentUserId) && !onLikePost)}
+                        disabled={isAuthPending || isLikeLoading || Boolean(likeStateError) || isDeleting || isLiking || (Boolean(currentUserId) && !onLikePost)}
                         aria-pressed={post.isLiked}
-                        aria-busy={isLiking}
+                        aria-busy={isLiking || isAuthPending || isLikeLoading}
                         title={post.isLiked ? "공감 취소" : "공감"}
                         className={`inline-flex h-10 min-w-24 items-center justify-center gap-1 rounded-full px-4 text-sm font-bold disabled:cursor-wait disabled:opacity-60 ${post.isLiked ? "bg-kta-red text-white" : "bg-red-50 text-kta-red"}`}
                         onClick={() => void handleLike()}
@@ -167,6 +175,12 @@ export default function PostDetailPage({
                     </span>
                 </div>
                 {likeError && <p role="alert" className="mt-2 text-sm text-kta-red">{likeError}</p>}
+                {likeStateError && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <p role="alert" className="text-sm text-kta-red">{likeStateError}</p>
+                        <button type="button" onClick={onRetryLikeState} className="min-h-11 text-sm font-semibold text-kta-navy">공감 상태 다시 확인</button>
+                    </div>
+                )}
                 {isDeleting && <p role="status" className="mt-2 text-sm text-kta-muted">삭제 중…</p>}
                 {deleteError && <p role="alert" className="mt-2 text-sm text-kta-red">{deleteError}</p>}
             </article>
@@ -176,7 +190,9 @@ export default function PostDetailPage({
                     댓글 {comments.length}
                 </h2>
                 <div className="mt-4">
-                    {currentUserId && onAddComment ? (
+                    {isAuthPending ? (
+                        <button type="button" disabled aria-busy="true" className="flex min-h-12 w-full items-center justify-center rounded-kta-md border border-kta-border bg-kta-subtle px-4 py-3 text-sm font-semibold text-kta-muted">댓글 작성</button>
+                    ) : currentUserId && onAddComment ? (
                         <CommentForm
                             onAddComment={(comment) =>
                                 onAddComment(post.id, comment)
@@ -197,6 +213,7 @@ export default function PostDetailPage({
                     <CommentList
                         comments={comments}
                         currentUserId={currentUserId}
+                        isAuthPending={isAuthPending}
                         onUpdateComment={onUpdateComment}
                         onDeleteComment={onDeleteComment}
                         onAddReply={onAddComment ? (parentId, form) => onAddComment(post.id, form, parentId) : undefined}

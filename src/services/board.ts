@@ -1,4 +1,4 @@
-import { getSupabase } from "../lib/supabase";
+import { getPublicSupabase, getSupabase } from "../lib/supabase";
 import { isPostId, mapComment, mapPost, parsePostLikeState } from "../utils/boardData";
 import type { CommentRow, PostLikeState, PostRow } from "../utils/boardData";
 import type { CommentFormData, PostFormData } from "../types/board";
@@ -8,13 +8,23 @@ const pageSize = 100;
 const postSelect = "id,author_id,board,title,content,view_count,created_at,updated_at,author:profiles!posts_author_id_fkey(id,nickname),comments(count)";
 const commentSelect = "id,post_id,parent_id,author_id,content,created_at,updated_at,author:profiles!comments_author_id_fkey(id,nickname)";
 
-async function getLikeStates(ids: string[], signal: AbortSignal) {
+async function getLikeStates(ids: string[], signal: AbortSignal, useMemberSession = false) {
     if (ids.length === 0) return new Map<string, PostLikeState>();
-    const { data, error } = await getSupabase().rpc("get_post_like_states", { p_post_ids: ids })
+    const client = useMemberSession ? getSupabase() : getPublicSupabase();
+    const { data, error } = await client.rpc("get_post_like_states", { p_post_ids: ids })
         .abortSignal(signal);
     if (error) throw new Error("공감 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
     if (!Array.isArray(data)) throw new Error("공감 응답을 확인하지 못했습니다.");
     return new Map(data.map(parsePostLikeState).map((state) => [state.post_id, state]));
+}
+
+export async function getMemberLikeStates(ids: string[], signal: AbortSignal) {
+    const result = new Map<string, PostLikeState>();
+    for (let offset = 0; offset < ids.length; offset += pageSize) {
+        const states = await getLikeStates(ids.slice(offset, offset + pageSize), signal, true);
+        for (const [id, state] of states) result.set(id, state);
+    }
+    return result;
 }
 
 export async function setPostLike(postId: string, liked: boolean): Promise<PostLikeState> {
@@ -33,7 +43,7 @@ export async function setPostLike(postId: string, liked: boolean): Promise<PostL
 
 export async function incrementPostViewCount(postId: string): Promise<number | null> {
     if (!isPostId(postId)) throw new Error("유효하지 않은 게시글입니다.");
-    const { data, error } = await getSupabase().rpc("increment_post_view_count", { p_post_id: postId });
+    const { data, error } = await getPublicSupabase().rpc("increment_post_view_count", { p_post_id: postId });
     if (error) throw new Error("조회수를 갱신하지 못했습니다.");
     if (data === null) return null;
     if (typeof data !== "number" || !Number.isInteger(data) || data < 0) {
@@ -135,14 +145,14 @@ export async function deletePost(postId: string): Promise<void> {
 
 export async function getPostForEdit(postId: string, signal: AbortSignal) {
     if (!isPostId(postId)) return null;
-    const { data, error } = await getSupabase().from("posts").select(postSelect)
+    const { data, error } = await getPublicSupabase().from("posts").select(postSelect)
         .eq("id", postId).abortSignal(signal).maybeSingle<PostRow>();
     if (error) throw new Error("게시글을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
     return data ? mapPost(data) : null;
 }
 
 export async function getBoardPosts(signal: AbortSignal) {
-    const client = getSupabase();
+    const client = getPublicSupabase();
     const rows: PostRow[] = [];
     const likes = new Map<string, PostLikeState>();
     for (let offset = 0; ; offset += pageSize) {
@@ -163,7 +173,7 @@ export async function getBoardPosts(signal: AbortSignal) {
 
 export async function getPostDetail(id: string, signal: AbortSignal) {
     if (!isPostId(id)) return null;
-    const client = getSupabase();
+    const client = getPublicSupabase();
     const { data: post, error } = await client.from("posts").select(postSelect)
         .eq("id", id).abortSignal(signal).maybeSingle<PostRow>();
     if (error) throw new Error("게시글을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");

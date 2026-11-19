@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getBoardPosts, getPostDetail, getPostForEdit, incrementPostViewCount } from "../services/board";
+import { usePostLikes } from "./usePostLikes";
 
 function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
     const [attempt, setAttempt] = useState(0);
@@ -27,19 +28,33 @@ function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
     return { ...state, retry, updateData };
 }
 
-export const useBoardPosts = () => useBoardQuery(getBoardPosts);
+export function useBoardPosts(viewerId: string | null = null) {
+    const query = useBoardQuery(getBoardPosts);
+    const likes = usePostLikes(query.data?.posts.map((post) => post.id) ?? [], viewerId);
+    return {
+        ...query,
+        data: query.data ? {
+            ...query.data,
+            posts: query.data.posts.map((post) => {
+                const state = likes.states.get(post.id);
+                return { ...post, likeCount: state?.like_count ?? post.likeCount, isLiked: state?.is_liked ?? false };
+            }),
+        } : null,
+    };
+}
 
 export function usePostForEdit(id: string) {
     const load = useCallback((signal: AbortSignal) => getPostForEdit(id, signal), [id]);
     return useBoardQuery(load);
 }
 
-export function usePostDetail(id: string) {
+export function usePostDetail(id: string, viewerId: string | null = null) {
     const load = useCallback((signal: AbortSignal) => getPostDetail(id, signal), [id]);
     const query = useBoardQuery(load);
     const viewedPostId = useRef<string | null>(null);
     const loadedPostId = query.data?.post.id;
     const { updateData } = query;
+    const likes = usePostLikes(loadedPostId ? [loadedPostId] : [], viewerId);
 
     useEffect(() => {
         if (loadedPostId !== id || viewedPostId.current === id) return;
@@ -54,5 +69,16 @@ export function usePostDetail(id: string) {
         });
     }, [id, loadedPostId, updateData]);
 
-    return query;
+    const likeState = likes.states.get(id);
+    return {
+        ...query,
+        data: query.data ? {
+            ...query.data,
+            post: { ...query.data.post, likeCount: likeState?.like_count ?? query.data.post.likeCount, isLiked: likeState?.is_liked ?? false },
+        } : null,
+        isLikeLoading: likes.isLoading,
+        likeStateError: likes.error,
+        retryLikeState: likes.retry,
+        updateLikeState: likes.updateLikeState,
+    };
 }
