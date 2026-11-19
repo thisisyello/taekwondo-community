@@ -17,6 +17,7 @@ export function useAuth() {
     const [isLoading, setIsLoading] = useState(supabase !== null);
     const [error, setError] = useState<string | null>(null);
     const [recoveryUserId, setRecoveryUserId] = useState<string | null>(readRecoveryUserId);
+    const [attempt, setAttempt] = useState(0);
 
     useEffect(() => {
         if (!supabase) return;
@@ -69,7 +70,13 @@ export function useAuth() {
             window.clearTimeout(timeoutId);
             subscription.unsubscribe();
         };
-    }, []);
+    }, [attempt]);
 
-    return { currentUser, isLoading, error, recoveryUserId, signIn, signUp, signOut };
+    const retry = () => {
+        setIsLoading(true);
+        setError(null);
+        setAttempt((value) => value + 1);
+    };
+
+    return { currentUser, isLoading, error, recoveryUserId, retry, signIn, signUp, signOut };
 }

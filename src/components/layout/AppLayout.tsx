@@ -7,6 +7,7 @@ type AppLayoutProps = {
     children: ReactNode;
     showBackButton?: boolean;
     showSearchButton?: boolean;
+    authNotice?: ReactNode;
 };
 
 export default function AppLayout({
@@ -14,6 +15,7 @@ export default function AppLayout({
     children,
     showBackButton = false,
     showSearchButton = false,
+    authNotice,
 }: AppLayoutProps) {
     return (
         <section className="min-h-svh bg-kta-bg text-kta-text">
@@ -23,6 +25,7 @@ export default function AppLayout({
                 showSearchButton={showSearchButton}
             />
             <main className="mx-auto flex max-w-3xl flex-col gap-4 px-4 pb-24 pt-4">
+                {authNotice}
                 {children}
             </main>
             <BottomNav />
