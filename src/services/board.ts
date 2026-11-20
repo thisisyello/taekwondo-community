@@ -1,11 +1,13 @@
 import { getPublicSupabase, getSupabase } from "../lib/supabase";
 import { isPostId, mapComment, mapPost, parsePostLikeState } from "../utils/boardData";
 import type { CommentRow, PostLikeState, PostRow } from "../utils/boardData";
-import type { BoardQueryFilters, CommentFormData, PostFormData } from "../types/board";
+import type { BoardPostsPage, BoardQueryFilters, CommentFormData, PostFormData } from "../types/board";
 import { getCommentContentError, getPostFormErrors } from "../utils/boardValidation";
+import { getBoardPageInfo, POSTS_PER_PAGE } from "../utils/boardPagination";
 
 const pageSize = 100;
-const postSelect = "id,author_id,board,title,content,view_count,created_at,updated_at,author:profiles!posts_author_id_fkey(id,nickname),comments(count)";
+// Computed-field ordering on search RPCs requires the complete posts row.
+const postSelect = "*,author:profiles!posts_author_id_fkey(id,nickname),comments(count)";
 const commentSelect = "id,post_id,parent_id,author_id,content,created_at,updated_at,author:profiles!comments_author_id_fkey(id,nickname)";
 
 async function getLikeStates(ids: string[], signal: AbortSignal, useMemberSession = false) {
@@ -151,31 +153,27 @@ export async function getPostForEdit(postId: string, signal: AbortSignal) {
     return data ? mapPost(data) : null;
 }
 
-export async function getBoardPosts(signal: AbortSignal, filters: BoardQueryFilters = {}) {
+export async function getBoardPostsPage(signal: AbortSignal, filters: BoardQueryFilters = {}, offset = 0): Promise<BoardPostsPage> {
+    if (!Number.isSafeInteger(offset) || offset < 0) throw new Error("유효하지 않은 게시글 페이지입니다.");
     const { board = "all", target = "all", sort = "latest" } = filters;
     const keyword = filters.keyword?.trim() ?? "";
     const client = getPublicSupabase();
-    const rows: PostRow[] = [];
-    const likes = new Map<string, PostLikeState>();
-    for (let offset = 0; ; offset += pageSize) {
-        let request = board === "all" && !keyword
-            ? client.from("posts").select(postSelect)
-            : client.rpc("search_board_posts", { p_board: board, p_target: target, p_keyword: keyword }).select(postSelect);
-        if (sort === "mostCommented") request = request.order("comment_count", { ascending: false });
-        const ascending = sort === "oldest";
-        const { data, error } = await request
-            .order("created_at", { ascending }).order("id", { ascending })
-            .range(offset, offset + pageSize - 1).abortSignal(signal).returns<PostRow[]>();
-        if (error) throw new Error("게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
-        if (!Array.isArray(data)) throw new Error("게시글 목록 응답을 확인하지 못했습니다.");
-        rows.push(...data);
-        const states = await getLikeStates(data.map((row) => row.id), signal);
-        for (const [id, state] of states) likes.set(id, state);
-        if (data.length < pageSize) break;
-    }
+    let request = board === "all" && !keyword
+        ? client.from("posts").select(postSelect, { count: "exact" })
+        : client.rpc("search_board_posts", { p_board: board, p_target: target, p_keyword: keyword }, { count: "exact" }).select(postSelect);
+    if (sort === "mostCommented") request = request.order("comment_count", { ascending: false });
+    const ascending = sort === "oldest";
+    const { data, count, error } = await request
+        .order("created_at", { ascending }).order("id", { ascending })
+        .range(offset, offset + POSTS_PER_PAGE - 1).abortSignal(signal).returns<PostRow[]>();
+    if (error) throw new Error("게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+    if (!Array.isArray(data)) throw new Error("게시글 목록 응답을 확인하지 못했습니다.");
+    const pageInfo = getBoardPageInfo(offset, data.length, count);
+    const likes = await getLikeStates(data.map((row) => row.id), signal);
     return {
-        posts: rows.map((row) => mapPost(row, likes.get(row.id))),
-        commentCountsByPostId: Object.fromEntries(rows.map((row) => [row.id, row.comments[0]?.count ?? 0])),
+        ...pageInfo,
+        posts: data.map((row) => mapPost(row, likes.get(row.id))),
+        commentCountsByPostId: Object.fromEntries(data.map((row) => [row.id, row.comments[0]?.count ?? 0])),
     };
 }
 

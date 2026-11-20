@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getBoardPosts, getPostDetail, getPostForEdit, incrementPostViewCount } from "../services/board";
+import { getPostDetail, getPostForEdit, incrementPostViewCount } from "../services/board";
 import { usePostLikes } from "./usePostLikes";
-import type { BoardQueryFilters } from "../types/board";
+export { useBoardPosts } from "./useBoardPosts";
 
 function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
     const [attempt, setAttempt] = useState(0);
@@ -28,26 +28,6 @@ function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
     }, [load]);
     const current = state.source === load ? state : { data: null, isLoading: true, error: null };
     return { data: current.data, isLoading: current.isLoading, error: current.error, retry, updateData };
-}
-
-export function useBoardPosts(viewerId: string | null = null, filters: BoardQueryFilters = {}, enabled = true) {
-    const { board = "all", target = "all", sort = "latest" } = filters;
-    const keyword = filters.keyword?.trim() ?? "";
-    const load = useCallback((signal: AbortSignal) => enabled
-        ? getBoardPosts(signal, { board, target, keyword, sort })
-        : Promise.resolve({ posts: [], commentCountsByPostId: {} }), [board, target, keyword, sort, enabled]);
-    const query = useBoardQuery(load);
-    const likes = usePostLikes(query.data?.posts.map((post) => post.id) ?? [], viewerId);
-    return {
-        ...query,
-        data: query.data ? {
-            ...query.data,
-            posts: query.data.posts.map((post) => {
-                const state = likes.states.get(post.id);
-                return { ...post, likeCount: state?.like_count ?? post.likeCount, isLiked: state?.is_liked ?? false };
-            }),
-        } : null,
-    };
 }
 
 export function usePostForEdit(id: string) {
