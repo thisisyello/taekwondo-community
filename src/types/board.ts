@@ -4,6 +4,12 @@ export type BoardFilterType = BoardType | "all";
 
 export type SearchTarget = "all" | "title" | "content" | "author";
 
+export type BoardQueryFilters = {
+    board?: BoardFilterType;
+    target?: SearchTarget;
+    keyword?: string;
+};
+
 export type PostSortType = "latest" | "oldest" | "mostCommented";
 
 export type BoardAuthor = {
