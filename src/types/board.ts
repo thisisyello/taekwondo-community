@@ -67,6 +67,14 @@ export type PostFormData = Omit<
     "id" | "author" | "likeCount" | "isLiked" | "viewCount" | "createdAt" | "updatedAt"
 >;
 
+export type BoardPostsPage = {
+    posts: Post[];
+    commentCountsByPostId: Record<string, number>;
+    totalCount: number | null;
+    nextOffset: number;
+    hasMore: boolean;
+};
+
 export type Comment = {
     id: string;
     postId: string;
