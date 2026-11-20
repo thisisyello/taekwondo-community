@@ -1,9 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Post } from "../../types/board";
 import type { PostSortType } from "../../types/board";
 import PostItem from "./PostItem";
 
-const POSTS_PER_LOAD = 5;
+export type PostListPagination = {
+    hasMore: boolean;
+    isLoadingMore: boolean;
+    error: string | null;
+    onLoadMore: () => void;
+};
 
 type PostListProps = {
     posts: Post[];
@@ -11,6 +16,7 @@ type PostListProps = {
     postSortType: PostSortType;
     onChangePostSortType: (sortType: PostSortType) => void;
     emptyMessage?: string;
+    pagination?: PostListPagination;
 };
 
 export default function PostList({
@@ -19,11 +25,20 @@ export default function PostList({
     postSortType,
     onChangePostSortType,
     emptyMessage = "게시글이 없습니다.",
+    pagination,
 }: PostListProps) {
-    const postListKey = useMemo(
-        () => posts.map((post) => post.id).join(","),
-        [posts],
-    );
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const { hasMore = false, isLoadingMore = false, error = null, onLoadMore } = pagination ?? {};
+
+    useEffect(() => {
+        const element = loadMoreRef.current;
+        if (!element || !hasMore || isLoadingMore || error || !onLoadMore) return;
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) onLoadMore();
+        }, { rootMargin: "0px" });
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [hasMore, isLoadingMore, error, onLoadMore, posts.length]);
 
     return (
         <section className="flex flex-col gap-3 pt-3">
@@ -48,67 +63,22 @@ export default function PostList({
                     {emptyMessage}
                 </p>
             ) : (
-                <VisiblePostList
-                    key={postListKey}
-                    posts={posts}
-                    commentCountsByPostId={commentCountsByPostId}
-                />
+                <ul className="flex flex-col gap-3">
+                    {posts.map((post) => (
+                        <PostItem key={post.id} post={post} commentCount={commentCountsByPostId[post.id] ?? 0} />
+                    ))}
+                </ul>
             )}
-        </section>
-    );
-}
-
-type VisiblePostListProps = {
-    posts: Post[];
-    commentCountsByPostId: Record<string, number>;
-};
-
-function VisiblePostList({
-    posts,
-    commentCountsByPostId,
-}: VisiblePostListProps) {
-    const [visibleCount, setVisibleCount] = useState(POSTS_PER_LOAD);
-    const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const visiblePosts = posts.slice(0, visibleCount);
-    const hasMorePosts = visibleCount < posts.length;
-
-    useEffect(() => {
-        const loadMoreElement = loadMoreRef.current;
-
-        if (!loadMoreElement || !hasMorePosts) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry.isIntersecting) return;
-
-                setVisibleCount((prev) =>
-                    Math.min(prev + POSTS_PER_LOAD, posts.length),
-                );
-            },
-            { rootMargin: "160px" },
-        );
-
-        observer.observe(loadMoreElement);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [hasMorePosts, posts.length, visibleCount]);
-
-    return (
-        <>
-            <ul className="flex flex-col gap-3">
-                {visiblePosts.map((post) => (
-                    <PostItem
-                        key={post.id}
-                        post={post}
-                        commentCount={commentCountsByPostId[post.id] ?? 0}
-                    />
-                ))}
-            </ul>
-            {hasMorePosts && (
+            {error ? (
+                <div className="flex flex-col items-center gap-3 py-4">
+                    <p role="alert" className="text-sm text-kta-red">{error}</p>
+                    <button type="button" onClick={onLoadMore} className="min-h-11 rounded-kta-md border border-kta-border px-4 text-sm font-semibold text-kta-text">다시 불러오기</button>
+                </div>
+            ) : isLoadingMore ? (
+                <p role="status" className="py-4 text-center text-sm text-kta-muted">게시글을 불러오고 있습니다.</p>
+            ) : hasMore && (
                 <div aria-hidden="true" className="h-6" ref={loadMoreRef} />
             )}
-        </>
+        </section>
     );
 }

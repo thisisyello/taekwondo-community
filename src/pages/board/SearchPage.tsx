@@ -18,7 +18,7 @@ export default function SearchPage({
     const [postSortType, setPostSortType] = useState<PostSortType>("latest");
 
     const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
-    const { data, isLoading, error, retry } = useBoardPosts(viewerId, {
+    const { data, isLoading, error, retry, hasMore, isLoadingMore, loadMoreError, loadMore } = useBoardPosts(viewerId, {
         target: searchTarget, keyword: submittedKeyword, sort: postSortType,
     }, hasSubmittedKeyword);
     const commentCountsByPostId = data?.commentCountsByPostId ?? {};
@@ -83,7 +83,7 @@ export default function SearchPage({
                     <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
                         <p className="break-words text-sm font-bold text-kta-text [overflow-wrap:anywhere]">
                             {searchTargetLabel}에서 "{submittedKeyword}" 검색
-                            {isLoading ? " 중…" : error ? "" : ` 결과 ${searchResults.length}건`}
+                            {isLoading ? " 중…" : error ? "" : ` 결과 ${data?.totalCount ?? searchResults.length}건${data?.totalCount == null && hasMore ? " 이상" : ""}`}
                         </p>
                     </div>
                     {isLoading ? <BoardSkeleton view="search" showFilters={false} /> : error ? (
@@ -97,6 +97,7 @@ export default function SearchPage({
                         postSortType={postSortType}
                         onChangePostSortType={setPostSortType}
                         emptyMessage="검색 결과가 없습니다."
+                        pagination={{ hasMore, isLoadingMore, error: loadMoreError, onLoadMore: loadMore }}
                     />}
                 </section>
             ) : (

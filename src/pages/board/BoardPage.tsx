@@ -2,6 +2,7 @@ import { FiEdit3 } from "react-icons/fi";
 import { Link } from "react-router";
 import BoardFilter from "../../components/board/BoardFilter";
 import PostList from "../../components/board/PostList";
+import type { PostListPagination } from "../../components/board/PostList";
 import BoardSkeleton from "../../components/board/BoardSkeleton";
 import type { BoardFilterType, Post, PostSortType } from "../../types/board";
 
@@ -16,6 +17,7 @@ type BoardPageProps = {
     isLoading?: boolean;
     error?: string | null;
     onRetry?: () => void;
+    pagination?: PostListPagination;
 };
 
 export default function BoardPage({
@@ -29,6 +31,7 @@ export default function BoardPage({
     isLoading = false,
     error,
     onRetry,
+    pagination,
 }: BoardPageProps) {
     return (
         <div>
@@ -49,6 +52,7 @@ export default function BoardPage({
                 commentCountsByPostId={commentCountsByPostId}
                 postSortType={postSortType}
                 onChangePostSortType={onChangePostSortType}
+                pagination={pagination}
             />}
 
             {isAuthPending ? (

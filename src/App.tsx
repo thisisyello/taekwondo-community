@@ -250,7 +250,7 @@ function BoardBrowseRoute(props: BoardBrowseRouteProps) {
 }
 
 function BoardListRoute(props: Extract<BoardBrowseRouteProps, { mode: "list" }>) {
-  const { data, isLoading, error, retry } = useBoardPosts(props.viewerId, { board: props.selectedBoardType, sort: props.postSortType });
+  const { data, isLoading, error, retry, hasMore, isLoadingMore, loadMoreError, loadMore } = useBoardPosts(props.viewerId, { board: props.selectedBoardType, sort: props.postSortType });
   return (
     <BoardPage
       posts={data?.posts ?? []}
@@ -258,6 +258,7 @@ function BoardListRoute(props: Extract<BoardBrowseRouteProps, { mode: "list" }>)
       isLoading={isLoading}
       error={error}
       onRetry={retry}
+      pagination={{ hasMore, isLoadingMore, error: loadMoreError, onLoadMore: loadMore }}
       postSortType={props.postSortType}
       onChangePostSortType={props.onChangePostSortType}
       selectedBoardType={props.selectedBoardType}
