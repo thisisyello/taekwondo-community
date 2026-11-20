@@ -152,17 +152,19 @@ export async function getPostForEdit(postId: string, signal: AbortSignal) {
 }
 
 export async function getBoardPosts(signal: AbortSignal, filters: BoardQueryFilters = {}) {
-    const { board = "all", target = "all" } = filters;
+    const { board = "all", target = "all", sort = "latest" } = filters;
     const keyword = filters.keyword?.trim() ?? "";
     const client = getPublicSupabase();
     const rows: PostRow[] = [];
     const likes = new Map<string, PostLikeState>();
     for (let offset = 0; ; offset += pageSize) {
-        const request = board === "all" && !keyword
+        let request = board === "all" && !keyword
             ? client.from("posts").select(postSelect)
             : client.rpc("search_board_posts", { p_board: board, p_target: target, p_keyword: keyword }).select(postSelect);
+        if (sort === "mostCommented") request = request.order("comment_count", { ascending: false });
+        const ascending = sort === "oldest";
         const { data, error } = await request
-            .order("created_at", { ascending: false }).order("id", { ascending: false })
+            .order("created_at", { ascending }).order("id", { ascending })
             .range(offset, offset + pageSize - 1).abortSignal(signal).returns<PostRow[]>();
         if (error) throw new Error("게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
         if (!Array.isArray(data)) throw new Error("게시글 목록 응답을 확인하지 못했습니다.");

@@ -31,11 +31,11 @@ function useBoardQuery<T>(load: (signal: AbortSignal) => Promise<T>) {
 }
 
 export function useBoardPosts(viewerId: string | null = null, filters: BoardQueryFilters = {}, enabled = true) {
-    const { board = "all", target = "all" } = filters;
+    const { board = "all", target = "all", sort = "latest" } = filters;
     const keyword = filters.keyword?.trim() ?? "";
     const load = useCallback((signal: AbortSignal) => enabled
-        ? getBoardPosts(signal, { board, target, keyword })
-        : Promise.resolve({ posts: [], commentCountsByPostId: {} }), [board, target, keyword, enabled]);
+        ? getBoardPosts(signal, { board, target, keyword, sort })
+        : Promise.resolve({ posts: [], commentCountsByPostId: {} }), [board, target, keyword, sort, enabled]);
     const query = useBoardQuery(load);
     const likes = usePostLikes(query.data?.posts.map((post) => post.id) ?? [], viewerId);
     return {

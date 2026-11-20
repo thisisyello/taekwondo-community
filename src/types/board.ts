@@ -8,6 +8,7 @@ export type BoardQueryFilters = {
     board?: BoardFilterType;
     target?: SearchTarget;
     keyword?: string;
+    sort?: PostSortType;
 };
 
 export type PostSortType = "latest" | "oldest" | "mostCommented";
