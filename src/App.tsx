@@ -20,7 +20,7 @@ import { useToast } from "./hooks/useToast";
 import { useAuth } from "./hooks/useAuth";
 import { useBoardPosts, usePostDetail, usePostForEdit } from "./hooks/useBoardData";
 import { isPostId } from "./utils/boardData";
-import { filterPostsByBoard, sortPosts } from "./utils/postList";
+import { sortPosts } from "./utils/postList";
 import { removeCommentBranch } from "./utils/commentThreads";
 import { isPublicRoute } from "./utils/authRoutes";
 import type { BoardFilterType, PostSortType } from "./types/board";
@@ -245,31 +245,24 @@ type BoardBrowseRouteProps = { viewerId: string | null; isAuthPending: boolean }
     });
 
 function BoardBrowseRoute(props: BoardBrowseRouteProps) {
-  const { data, isLoading, error, retry } = useBoardPosts(props.viewerId);
-  if (isLoading)
-    return <BoardSkeleton view={props.mode} />;
-  if (error || !data)
-    return (
-      <ErrorState
-        message={error ?? "게시글 목록을 불러오지 못했습니다."}
-        onRetry={retry}
-      />
-    );
   if (props.mode === "search")
-    return (
-      <SearchPage
-        posts={data.posts}
-        commentCountsByPostId={data.commentCountsByPostId}
-      />
-    );
+    return <SearchPage viewerId={props.viewerId} />;
+  return <BoardListRoute {...props} />;
+}
+
+function BoardListRoute(props: Extract<BoardBrowseRouteProps, { mode: "list" }>) {
+  const { data, isLoading, error, retry } = useBoardPosts(props.viewerId, { board: props.selectedBoardType });
   return (
     <BoardPage
       posts={sortPosts(
-        filterPostsByBoard(data.posts, props.selectedBoardType),
+        data?.posts ?? [],
         props.postSortType,
-        data.commentCountsByPostId,
+        data?.commentCountsByPostId ?? {},
       )}
-      commentCountsByPostId={data.commentCountsByPostId}
+      commentCountsByPostId={data?.commentCountsByPostId ?? {}}
+      isLoading={isLoading}
+      error={error}
+      onRetry={retry}
       postSortType={props.postSortType}
       onChangePostSortType={props.onChangePostSortType}
       selectedBoardType={props.selectedBoardType}

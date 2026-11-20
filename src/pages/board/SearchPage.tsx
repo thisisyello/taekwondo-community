@@ -1,16 +1,16 @@
 import { useState } from "react";
 import PostList from "../../components/board/PostList";
-import type { Post, PostSortType, SearchTarget } from "../../types/board";
-import { filterPostsBySearch, sortPosts } from "../../utils/postList";
+import BoardSkeleton from "../../components/board/BoardSkeleton";
+import { useBoardPosts } from "../../hooks/useBoardData";
+import type { PostSortType, SearchTarget } from "../../types/board";
+import { sortPosts } from "../../utils/postList";
 
 type SearchPageProps = {
-    posts: Post[];
-    commentCountsByPostId: Record<string, number>;
+    viewerId: string | null;
 };
 
 export default function SearchPage({
-    posts,
-    commentCountsByPostId,
+    viewerId,
 }: SearchPageProps) {
     const [inputKeyword, setInputKeyword] = useState("");
     const [submittedKeyword, setSubmittedKeyword] = useState("");
@@ -18,17 +18,16 @@ export default function SearchPage({
     const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
     const [postSortType, setPostSortType] = useState<PostSortType>("latest");
 
-    const searchResults = filterPostsBySearch(
-        posts,
-        searchTarget,
-        submittedKeyword,
-    );
+    const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
+    const { data, isLoading, error, retry } = useBoardPosts(viewerId, {
+        target: searchTarget, keyword: submittedKeyword,
+    }, hasSubmittedKeyword);
+    const commentCountsByPostId = data?.commentCountsByPostId ?? {};
     const sortedSearchResults = sortPosts(
-        searchResults,
+        data?.posts ?? [],
         postSortType,
         commentCountsByPostId,
     );
-    const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
     const searchTargetLabel = getSearchTargetLabel(searchTarget);
 
     const submitKeyword = (keyword: string) => {
@@ -36,6 +35,7 @@ export default function SearchPage({
 
         if (!nextKeyword) return;
 
+        if (nextKeyword === submittedKeyword) retry();
         setSubmittedKeyword(nextKeyword);
         setInputKeyword(nextKeyword);
         setRecentKeywords((prev) => [
@@ -56,6 +56,7 @@ export default function SearchPage({
                 onSubmit={handleSubmit}
             >
                 <select
+                    aria-label="검색 대상"
                     className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none focus:border-kta-navy"
                     value={searchTarget}
                     onChange={(event) =>
@@ -85,18 +86,23 @@ export default function SearchPage({
             {hasSubmittedKeyword ? (
                 <section className="flex flex-col gap-3">
                     <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
-                        <p className="text-sm font-bold text-kta-text">
+                        <p className="break-words text-sm font-bold text-kta-text [overflow-wrap:anywhere]">
                             {searchTargetLabel}에서 "{submittedKeyword}" 검색
-                            결과 {sortedSearchResults.length}건
+                            {isLoading ? " 중…" : error ? "" : ` 결과 ${sortedSearchResults.length}건`}
                         </p>
                     </div>
-                    <PostList
+                    {isLoading ? <BoardSkeleton view="search" showFilters={false} /> : error ? (
+                        <div className="flex flex-col items-center gap-3 py-8">
+                            <p role="alert" className="text-sm text-kta-red">{error}</p>
+                            <button type="button" onClick={retry} className="min-h-11 rounded-kta-md bg-kta-navy px-4 text-sm font-semibold text-white">다시 시도</button>
+                        </div>
+                    ) : <PostList
                         posts={sortedSearchResults}
                         commentCountsByPostId={commentCountsByPostId}
                         postSortType={postSortType}
                         onChangePostSortType={setPostSortType}
                         emptyMessage="검색 결과가 없습니다."
-                    />
+                    />}
                 </section>
             ) : (
                 <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">

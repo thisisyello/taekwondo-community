@@ -1,10 +1,10 @@
-type BoardSkeletonProps = { view: "list" | "search" | "detail" };
+type BoardSkeletonProps = { view: "list" | "search" | "detail"; showFilters?: boolean };
 
 function Placeholder({ className }: { className: string }) {
     return <div className={`rounded bg-gray-200 ${className}`} />;
 }
 
-export default function BoardSkeleton({ view }: BoardSkeletonProps) {
+export default function BoardSkeleton({ view, showFilters = true }: BoardSkeletonProps) {
     return (
         <div role="status" aria-busy="true">
             <span className="sr-only">게시글을 불러오고 있습니다.</span>
@@ -40,12 +40,12 @@ export default function BoardSkeleton({ view }: BoardSkeletonProps) {
                     </>
                 ) : (
                     <>
-                        <div className="flex gap-3 overflow-hidden rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm">
+                        {showFilters && <div className="flex gap-3 overflow-hidden rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm">
                             <Placeholder className="h-9 w-20 shrink-0" />
                             <Placeholder className="h-9 flex-1" />
                             <Placeholder className="h-9 w-20 shrink-0" />
-                        </div>
-                        {view === "search" && <Placeholder className="h-12 w-full" />}
+                        </div>}
+                        {showFilters && view === "search" && <Placeholder className="h-12 w-full" />}
                         <Placeholder className="h-9 w-24 self-end" />
                         {Array.from({ length: 5 }, (_, index) => (
                             <div key={index} className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
