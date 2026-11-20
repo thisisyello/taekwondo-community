@@ -3,7 +3,6 @@ import PostList from "../../components/board/PostList";
 import BoardSkeleton from "../../components/board/BoardSkeleton";
 import { useBoardPosts } from "../../hooks/useBoardData";
 import type { PostSortType, SearchTarget } from "../../types/board";
-import { sortPosts } from "../../utils/postList";
 
 type SearchPageProps = {
     viewerId: string | null;
@@ -20,14 +19,10 @@ export default function SearchPage({
 
     const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
     const { data, isLoading, error, retry } = useBoardPosts(viewerId, {
-        target: searchTarget, keyword: submittedKeyword,
+        target: searchTarget, keyword: submittedKeyword, sort: postSortType,
     }, hasSubmittedKeyword);
     const commentCountsByPostId = data?.commentCountsByPostId ?? {};
-    const sortedSearchResults = sortPosts(
-        data?.posts ?? [],
-        postSortType,
-        commentCountsByPostId,
-    );
+    const searchResults = data?.posts ?? [];
     const searchTargetLabel = getSearchTargetLabel(searchTarget);
 
     const submitKeyword = (keyword: string) => {
@@ -88,7 +83,7 @@ export default function SearchPage({
                     <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
                         <p className="break-words text-sm font-bold text-kta-text [overflow-wrap:anywhere]">
                             {searchTargetLabel}에서 "{submittedKeyword}" 검색
-                            {isLoading ? " 중…" : error ? "" : ` 결과 ${sortedSearchResults.length}건`}
+                            {isLoading ? " 중…" : error ? "" : ` 결과 ${searchResults.length}건`}
                         </p>
                     </div>
                     {isLoading ? <BoardSkeleton view="search" showFilters={false} /> : error ? (
@@ -97,7 +92,7 @@ export default function SearchPage({
                             <button type="button" onClick={retry} className="min-h-11 rounded-kta-md bg-kta-navy px-4 text-sm font-semibold text-white">다시 시도</button>
                         </div>
                     ) : <PostList
-                        posts={sortedSearchResults}
+                        posts={searchResults}
                         commentCountsByPostId={commentCountsByPostId}
                         postSortType={postSortType}
                         onChangePostSortType={setPostSortType}

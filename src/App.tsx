@@ -20,7 +20,6 @@ import { useToast } from "./hooks/useToast";
 import { useAuth } from "./hooks/useAuth";
 import { useBoardPosts, usePostDetail, usePostForEdit } from "./hooks/useBoardData";
 import { isPostId } from "./utils/boardData";
-import { sortPosts } from "./utils/postList";
 import { removeCommentBranch } from "./utils/commentThreads";
 import { isPublicRoute } from "./utils/authRoutes";
 import type { BoardFilterType, PostSortType } from "./types/board";
@@ -251,14 +250,10 @@ function BoardBrowseRoute(props: BoardBrowseRouteProps) {
 }
 
 function BoardListRoute(props: Extract<BoardBrowseRouteProps, { mode: "list" }>) {
-  const { data, isLoading, error, retry } = useBoardPosts(props.viewerId, { board: props.selectedBoardType });
+  const { data, isLoading, error, retry } = useBoardPosts(props.viewerId, { board: props.selectedBoardType, sort: props.postSortType });
   return (
     <BoardPage
-      posts={sortPosts(
-        data?.posts ?? [],
-        props.postSortType,
-        data?.commentCountsByPostId ?? {},
-      )}
+      posts={data?.posts ?? []}
       commentCountsByPostId={data?.commentCountsByPostId ?? {}}
       isLoading={isLoading}
       error={error}
