@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { FiEdit3 } from "react-icons/fi";
 import { Link } from "react-router";
 import BoardFilter from "../../components/board/BoardFilter";
@@ -33,6 +34,17 @@ export default function BoardPage({
     onRetry,
     pagination,
 }: BoardPageProps) {
+    const listStartRef = useRef<HTMLDivElement | null>(null);
+    const previousConditions = useRef({ selectedBoardType, postSortType });
+
+    useLayoutEffect(() => {
+        const previous = previousConditions.current;
+        previousConditions.current = { selectedBoardType, postSortType };
+        if (previous.selectedBoardType === selectedBoardType && previous.postSortType === postSortType) return;
+
+        listStartRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
+    }, [selectedBoardType, postSortType]);
+
     return (
         <div>
             <div className="rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm">
@@ -42,18 +54,20 @@ export default function BoardPage({
                 />
             </div>
 
-            {isLoading ? <div className="pt-3"><BoardSkeleton view="list" showFilters={false} /></div> : error ? (
-                <div className="flex flex-col items-center gap-3 py-10">
-                    <p role="alert" className="text-sm text-kta-red">{error}</p>
-                    <button type="button" onClick={onRetry} className="min-h-11 rounded-kta-md bg-kta-navy px-4 text-sm font-semibold text-white">다시 시도</button>
-                </div>
-            ) : <PostList
-                posts={posts}
-                commentCountsByPostId={commentCountsByPostId}
-                postSortType={postSortType}
-                onChangePostSortType={onChangePostSortType}
-                pagination={pagination}
-            />}
+            <div ref={listStartRef} className="scroll-mt-18">
+                {isLoading ? <div className="pt-3"><BoardSkeleton view="list" showFilters={false} /></div> : error ? (
+                    <div className="flex flex-col items-center gap-3 py-10">
+                        <p role="alert" className="text-sm text-kta-red">{error}</p>
+                        <button type="button" onClick={onRetry} className="min-h-11 rounded-kta-md bg-kta-navy px-4 text-sm font-semibold text-white">다시 시도</button>
+                    </div>
+                ) : <PostList
+                    posts={posts}
+                    commentCountsByPostId={commentCountsByPostId}
+                    postSortType={postSortType}
+                    onChangePostSortType={onChangePostSortType}
+                    pagination={pagination}
+                />}
+            </div>
 
             {isAuthPending ? (
                 <button type="button" disabled aria-busy="true" title="로그인 정보를 확인하고 있습니다."
