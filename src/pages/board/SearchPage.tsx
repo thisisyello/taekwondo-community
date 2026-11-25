@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import PostList from "../../components/board/PostList";
 import BoardSkeleton from "../../components/board/BoardSkeleton";
 import { useBoardPosts } from "../../hooks/useBoardData";
@@ -16,6 +16,13 @@ export default function SearchPage({
     const [recentKeywords, setRecentKeywords] = useState<string[]>([]);
     const [searchTarget, setSearchTarget] = useState<SearchTarget>("all");
     const [postSortType, setPostSortType] = useState<PostSortType>("latest");
+    const [submissionCount, setSubmissionCount] = useState(0);
+    const resultsStartRef = useRef<HTMLElement | null>(null);
+
+    useLayoutEffect(() => {
+        if (!submittedKeyword) return;
+        resultsStartRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
+    }, [submittedKeyword, searchTarget, postSortType, submissionCount]);
 
     const hasSubmittedKeyword = submittedKeyword.trim().length > 0;
     const { data, isLoading, error, retry, hasMore, isLoadingMore, loadMoreError, loadMore } = useBoardPosts(viewerId, {
@@ -31,6 +38,7 @@ export default function SearchPage({
         if (!nextKeyword) return;
 
         if (nextKeyword === submittedKeyword) retry();
+        setSubmissionCount((count) => count + 1);
         setSubmittedKeyword(nextKeyword);
         setInputKeyword(nextKeyword);
         setRecentKeywords((prev) => [
@@ -79,7 +87,7 @@ export default function SearchPage({
             </form>
 
             {hasSubmittedKeyword ? (
-                <section className="flex flex-col gap-3">
+                <section ref={resultsStartRef} className="flex scroll-mt-18 flex-col gap-3">
                     <div className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
                         <p className="break-words text-sm font-bold text-kta-text [overflow-wrap:anywhere]">
                             {searchTargetLabel}에서 "{submittedKeyword}" 검색
