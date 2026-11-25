@@ -34,6 +34,7 @@ export function useBoardPosts(viewerId: string | null = null, filters: BoardQuer
             session.nextOffset = page.nextOffset;
             session.hasMore = page.hasMore;
             setResult((previous) => {
+                if (session.controller.signal.aborted || sessionRef.current !== session) return previous;
                 if (append && (previous?.request !== session.request || !previous.data)) return previous;
                 return {
                     request: session.request,
@@ -44,10 +45,13 @@ export function useBoardPosts(viewerId: string | null = null, filters: BoardQuer
         }).catch((cause: unknown) => {
             if (session.controller.signal.aborted || sessionRef.current !== session) return;
             const message = cause instanceof Error ? cause.message : "게시글을 불러오지 못했습니다.";
-            setResult((previous) => append && previous?.request === session.request ? {
-                ...previous, isLoadingMore: false, loadMoreError: message,
-            } : {
-                request: session.request, data: null, error: message, isLoadingMore: false, loadMoreError: null,
+            setResult((previous) => {
+                if (session.controller.signal.aborted || sessionRef.current !== session) return previous;
+                return append && previous?.request === session.request ? {
+                    ...previous, isLoadingMore: false, loadMoreError: message,
+                } : {
+                    request: session.request, data: null, error: message, isLoadingMore: false, loadMoreError: null,
+                };
             });
         }).finally(() => {
             session.inFlight = false;
@@ -57,7 +61,8 @@ export function useBoardPosts(viewerId: string | null = null, filters: BoardQuer
     useEffect(() => {
         if (!request.enabled) return;
         const session: PageSession = {
-            request, controller: new AbortController(), nextOffset: 0, hasMore: true, inFlight: true,
+            // Only a successful first page can enable additional requests.
+            request, controller: new AbortController(), nextOffset: 0, hasMore: false, inFlight: true,
         };
         sessionRef.current = session;
         void fetchPage(session, false);
