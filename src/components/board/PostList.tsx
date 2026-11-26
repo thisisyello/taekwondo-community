@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { Post } from "../../types/board";
 import type { PostSortType } from "../../types/board";
 import PostItem from "./PostItem";
+import BoardSkeleton from "./BoardSkeleton";
 
 export type PostListPagination = {
     hasMore: boolean;
@@ -75,7 +76,7 @@ export default function PostList({
                     <button type="button" onClick={onLoadMore} className="min-h-11 rounded-kta-md border border-kta-border px-4 text-sm font-semibold text-kta-text">다시 불러오기</button>
                 </div>
             ) : isLoadingMore ? (
-                <p role="status" className="py-4 text-center text-sm text-kta-muted">게시글을 불러오고 있습니다.</p>
+                <BoardSkeleton view="more" />
             ) : hasMore && (
                 <div aria-hidden="true" className="h-6" ref={loadMoreRef} />
             )}

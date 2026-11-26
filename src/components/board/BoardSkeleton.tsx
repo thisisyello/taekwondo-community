@@ -1,4 +1,4 @@
-type BoardSkeletonProps = { view: "list" | "search" | "detail"; showFilters?: boolean };
+type BoardSkeletonProps = { view: "list" | "search" | "detail" | "more"; showFilters?: boolean };
 
 function Placeholder({ className }: { className: string }) {
     return <div className={`rounded bg-gray-200 ${className}`} />;
@@ -7,7 +7,7 @@ function Placeholder({ className }: { className: string }) {
 export default function BoardSkeleton({ view, showFilters = true }: BoardSkeletonProps) {
     return (
         <div role="status" aria-busy="true">
-            <span className="sr-only">게시글을 불러오고 있습니다.</span>
+            <span className="sr-only">{view === "more" ? "게시글을 추가로 불러오고 있습니다." : "게시글을 불러오고 있습니다."}</span>
             <div aria-hidden="true" className="flex flex-col gap-4 motion-safe:animate-pulse">
                 {view === "detail" ? (
                     <>
@@ -40,14 +40,14 @@ export default function BoardSkeleton({ view, showFilters = true }: BoardSkeleto
                     </>
                 ) : (
                     <>
-                        {showFilters && <div className="flex gap-3 overflow-hidden rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm">
+                        {view !== "more" && showFilters && <div className="flex gap-3 overflow-hidden rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm">
                             <Placeholder className="h-9 w-20 shrink-0" />
                             <Placeholder className="h-9 flex-1" />
                             <Placeholder className="h-9 w-20 shrink-0" />
                         </div>}
                         {showFilters && view === "search" && <Placeholder className="h-12 w-full" />}
-                        <Placeholder className="h-9 w-24 self-end" />
-                        {Array.from({ length: 5 }, (_, index) => (
+                        {view !== "more" && <Placeholder className="h-9 w-24 self-end" />}
+                        {Array.from({ length: view === "more" ? 2 : 5 }, (_, index) => (
                             <div key={index} className="rounded-kta-lg border border-kta-border bg-kta-surface px-5 py-4 shadow-kta-sm">
                                 <Placeholder className="h-4 w-20" />
                                 <Placeholder className="mt-1 h-6 w-3/4" />
