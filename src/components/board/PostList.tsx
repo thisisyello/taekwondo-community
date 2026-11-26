@@ -18,6 +18,7 @@ type PostListProps = {
     postSortType: PostSortType;
     onChangePostSortType: (sortType: PostSortType) => void;
     emptyMessage?: string;
+    endMessage?: string;
     pagination?: PostListPagination;
 };
 
@@ -27,6 +28,7 @@ export default function PostList({
     postSortType,
     onChangePostSortType,
     emptyMessage = "게시글이 없습니다.",
+    endMessage = "모든 게시글을 확인했습니다.",
     pagination,
 }: PostListProps) {
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -85,9 +87,11 @@ export default function PostList({
                         다시 불러오기
                     </button>
                 </div>
-            ) : hasMore && (
+            ) : hasMore ? (
                 <div aria-hidden="true" className="h-6" ref={loadMoreRef} />
-            )}
+            ) : pagination && posts.length > 0 ? (
+                <p role="status" className="border-t border-kta-border px-4 py-6 text-center text-sm text-kta-muted">{endMessage}</p>
+            ) : null}
         </section>
     );
 }

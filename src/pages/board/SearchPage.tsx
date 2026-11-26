@@ -105,6 +105,7 @@ export default function SearchPage({
                         postSortType={postSortType}
                         onChangePostSortType={setPostSortType}
                         emptyMessage="검색 결과가 없습니다."
+                        endMessage="모든 검색 결과를 확인했습니다."
                         pagination={{ hasMore, isLoadingMore, error: loadMoreError, onLoadMore: loadMore }}
                     />}
                 </section>
