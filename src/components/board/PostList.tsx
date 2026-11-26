@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { FiRefreshCw } from "react-icons/fi";
+import { FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import type { Post } from "../../types/board";
 import type { PostSortType } from "../../types/board";
 import PostItem from "./PostItem";
@@ -47,19 +47,23 @@ export default function PostList({
     return (
         <section className="flex flex-col gap-3 pt-3">
             <div className="flex justify-end">
-                <select
-                    className="h-9 rounded-full border border-kta-border bg-kta-surface px-3 text-xs font-bold text-kta-muted outline-none focus:border-kta-navy"
-                    value={postSortType}
-                    onChange={(event) =>
-                        onChangePostSortType(
-                            event.target.value as PostSortType,
-                        )
-                    }
-                >
-                    <option value="latest">최신순</option>
-                    <option value="oldest">오래된순</option>
-                    <option value="mostCommented">댓글 많은순</option>
-                </select>
+                <div className="relative w-30 max-w-full">
+                    <select
+                        aria-label="게시글 정렬"
+                        className="h-9 w-full appearance-none rounded-full border border-kta-border bg-kta-surface pl-3 pr-9 text-left text-xs font-bold text-kta-muted outline-none focus:border-kta-navy"
+                        value={postSortType}
+                        onChange={(event) =>
+                            onChangePostSortType(
+                                event.target.value as PostSortType,
+                            )
+                        }
+                    >
+                        <option value="latest">최신순</option>
+                        <option value="oldest">오래된순</option>
+                        <option value="mostCommented">댓글 많은순</option>
+                    </select>
+                    <FiChevronDown aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-kta-muted" />
+                </div>
             </div>
 
             {posts.length === 0 ? (

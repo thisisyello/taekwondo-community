@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import { FiChevronDown } from "react-icons/fi";
 import PostList from "../../components/board/PostList";
 import BoardSkeleton from "../../components/board/BoardSkeleton";
 import { useBoardPosts } from "../../hooks/useBoardData";
@@ -58,19 +59,22 @@ export default function SearchPage({
                 className="grid gap-2 rounded-kta-lg border border-kta-border bg-kta-surface p-4 shadow-kta-sm sm:grid-cols-[120px_1fr_88px]"
                 onSubmit={handleSubmit}
             >
-                <select
-                    aria-label="검색 대상"
-                    className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none focus:border-kta-navy"
-                    value={searchTarget}
-                    onChange={(event) =>
-                        setSearchTarget(event.target.value as SearchTarget)
-                    }
-                >
-                    <option value="all">전체</option>
-                    <option value="title">제목</option>
-                    <option value="content">내용</option>
-                    <option value="author">작성자</option>
-                </select>
+                <div className="relative min-w-0">
+                    <select
+                        aria-label="검색 대상"
+                        className="h-11 w-full min-w-0 appearance-none rounded-kta-md border border-kta-border bg-white pl-3 pr-9 text-left text-sm text-kta-text outline-none focus:border-kta-navy"
+                        value={searchTarget}
+                        onChange={(event) =>
+                            setSearchTarget(event.target.value as SearchTarget)
+                        }
+                    >
+                        <option value="all">전체</option>
+                        <option value="title">제목</option>
+                        <option value="content">내용</option>
+                        <option value="author">작성자</option>
+                    </select>
+                    <FiChevronDown aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-kta-muted" />
+                </div>
                 <input
                     autoFocus
                     className="h-11 rounded-kta-md border border-kta-border bg-white px-3 text-sm text-kta-text outline-none placeholder:text-kta-muted focus:border-kta-navy"
