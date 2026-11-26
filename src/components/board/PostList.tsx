@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { FiRefreshCw } from "react-icons/fi";
 import type { Post } from "../../types/board";
 import type { PostSortType } from "../../types/board";
 import PostItem from "./PostItem";
@@ -70,13 +71,20 @@ export default function PostList({
                     ))}
                 </ul>
             )}
-            {error ? (
-                <div className="flex flex-col items-center gap-3 py-4">
-                    <p role="alert" className="text-sm text-kta-red">{error}</p>
-                    <button type="button" onClick={onLoadMore} className="min-h-11 rounded-kta-md border border-kta-border px-4 text-sm font-semibold text-kta-text">다시 불러오기</button>
-                </div>
-            ) : isLoadingMore ? (
+            {isLoadingMore ? (
                 <BoardSkeleton view="more" />
+            ) : error ? (
+                <div className="flex flex-col items-center gap-3 border-t border-kta-border px-4 py-6 text-center">
+                    <div role="alert" className="max-w-full text-sm">
+                        <p className="font-semibold text-kta-red">추가 게시글을 불러오지 못했습니다.</p>
+                        <p className="mt-1 break-words text-kta-muted [overflow-wrap:anywhere]">{error}</p>
+                    </div>
+                    <button type="button" onClick={onLoadMore}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-kta-md border border-kta-border bg-kta-surface px-4 text-sm font-semibold text-kta-text hover:bg-kta-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kta-navy">
+                        <FiRefreshCw aria-hidden="true" />
+                        다시 불러오기
+                    </button>
+                </div>
             ) : hasMore && (
                 <div aria-hidden="true" className="h-6" ref={loadMoreRef} />
             )}
