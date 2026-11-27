@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useState } from "react";
+import { FiEdit3 } from "react-icons/fi";
 import type { CurrentUser } from "../../types/user";
 import { formatDate } from "../../utils/date";
 
@@ -61,6 +62,11 @@ export default function MyPage({ currentUser, onLogout }: MyPageProps) {
                 ]}
                 title="계정정보"
             />
+
+            <Link to="/me/edit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-kta-md border border-kta-border bg-kta-surface px-4 text-sm font-bold text-kta-navy">
+                <FiEdit3 aria-hidden="true" />
+                회원정보 수정
+            </Link>
 
             <section className="rounded-kta-lg border border-kta-border bg-kta-surface p-5 shadow-kta-sm">
                 <h2 className="text-base font-black text-kta-navy">

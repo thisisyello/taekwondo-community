@@ -7,7 +7,7 @@ test("public content does not wait for auth, while protected and callback routes
     for (const path of ["/", "/search", "/search/", "/SEARCH", "/dojang", "/forgot-password", `/posts/${id}`, `/posts/${id}/`]) {
         assert.equal(isPublicRoute(path), true, path);
     }
-    for (const path of ["/login", "/signup", "/auth/callback", "/reset-password", "/home", "/chats", "/me", "/posts/new", "/posts/new/", "/posts/NEW", "/posts/%6eew", `/posts/${id}/edit`, "/unknown"]) {
+    for (const path of ["/login", "/signup", "/auth/callback", "/reset-password", "/home", "/chats", "/me", "/me/edit", "/posts/new", "/posts/new/", "/posts/NEW", "/posts/%6eew", `/posts/${id}/edit`, "/unknown"]) {
         assert.equal(isPublicRoute(path), false, path);
     }
 });

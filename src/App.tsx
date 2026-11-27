@@ -11,6 +11,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import MyPage from "./pages/account/MyPage";
+import ProfileEditPage from "./pages/account/ProfileEditPage";
 import PostDetailPage from "./pages/board/PostDetailPage";
 import PostEditorPage from "./pages/board/PostEditorPage";
 import { createComment, createPost, deleteComment, deletePost, setPostLike, updateComment, updatePost } from "./services/board";
@@ -35,6 +36,7 @@ export default function App() {
     signIn,
     signUp,
     signOut,
+    updateProfile,
   } = useAuth();
   const showToast = useToast();
   const [selectedBoardType, setSelectedBoardType] =
@@ -47,7 +49,7 @@ export default function App() {
       : undefined;
   const returnTo =
     typeof requestedPath === "string" &&
-    (["/dojang", "/home", "/chats", "/me", "/posts/new"].includes(requestedPath) ||
+    (["/dojang", "/home", "/chats", "/me", "/me/edit", "/posts/new"].includes(requestedPath) ||
       (detailId && isPostId(detailId)))
       ? requestedPath
       : "/";
@@ -190,6 +192,18 @@ export default function App() {
           currentUser ? (
             <AppLayout title="내정보" showBackButton>
               <MyPage currentUser={currentUser} onLogout={signOut} />
+            </AppLayout>
+          ) : (
+            <LoginRequiredRedirect />
+          )
+        }
+      />
+      <Route
+        path="/me/edit"
+        element={
+          currentUser ? (
+            <AppLayout title="회원정보 수정" showBackButton>
+              <ProfileEditPage key={currentUser.id} currentUser={currentUser} onSave={updateProfile} />
             </AppLayout>
           ) : (
             <LoginRequiredRedirect />
