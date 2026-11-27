@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { PGlite } from "@electric-sql/pglite";
-import { getEmailError, getSignupErrors } from "../src/utils/authValidation.ts";
+import { getEmailError, getProfileErrors, getSignupErrors } from "../src/utils/authValidation.ts";
 import { formatMobilePhoneNumber } from "../src/utils/phone.ts";
 
 const validSignup = {
@@ -13,6 +13,19 @@ const validSignup = {
     phoneNumber: "010-1234-5678",
     nickname: "Member One",
 };
+
+test("profile form validates editable fields without email or password", () => {
+    const data = { name: "Member", nickname: "Member One", phoneNumber: "010-1234-5678" };
+    assert.deepEqual(getProfileErrors(data), {});
+    assert.ok(getProfileErrors({ ...data, name: " " }).name);
+    assert.ok(getProfileErrors({ ...data, name: "a".repeat(81) }).name);
+    assert.ok(getProfileErrors({ ...data, nickname: " " }).nickname);
+    assert.ok(getProfileErrors({ ...data, nickname: "a".repeat(31) }).nickname);
+    assert.ok(getProfileErrors({ ...data, phoneNumber: "010abc12345678" }).phoneNumber);
+    assert.ok(getProfileErrors({ ...data, phoneNumber: "010" }).phoneNumber);
+    assert.deepEqual(getProfileErrors({ ...data, phoneNumber: "010-402-3617" }), {});
+    assert.deepEqual(getProfileErrors({ ...data, name: "  Member  ", nickname: "  Member One  " }), {});
+});
 
 test("signup validation accepts complete data and rejects invalid values", () => {
     assert.equal(Object.values(getSignupErrors(validSignup, validSignup.password)).some(Boolean), false);

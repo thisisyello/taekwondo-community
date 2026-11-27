@@ -15,6 +15,8 @@ export type User = {
 
 export type CurrentUser = User;
 
+export type ProfileFormData = Pick<User, "name" | "nickname" | "phoneNumber">;
+
 export type SignupFormData = {
     email: string;
     password: string;

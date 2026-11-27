@@ -1,4 +1,4 @@
-import type { SignupFormData } from "../types/user";
+import type { ProfileFormData, SignupFormData } from "../types/user";
 
 export function getEmailError(email: string): string | undefined {
     if (!email.trim()) return "이메일을 입력해주세요.";
@@ -7,10 +7,22 @@ export function getEmailError(email: string): string | undefined {
     }
 }
 
-export function getSignupErrors(data: SignupFormData, passwordConfirm: string) {
-    const errors: Partial<Record<keyof SignupFormData | "passwordConfirm", string>> = {};
+export function getProfileErrors(data: ProfileFormData) {
+    const errors: Partial<Record<keyof ProfileFormData, string>> = {};
     if (!data.name.trim()) errors.name = "이름을 입력해주세요.";
     else if (data.name.trim().length > 80) errors.name = "이름은 80자 이내로 입력해주세요.";
+
+    if (!/^\+?[\d\s()-]+$/.test(data.phoneNumber.trim()) ||
+        !/^\d{8,15}$/.test(data.phoneNumber.replace(/\D/g, ""))) {
+        errors.phoneNumber = "올바른 전화번호를 입력해주세요.";
+    }
+    if (!data.nickname.trim()) errors.nickname = "공용 닉네임을 입력해주세요.";
+    else if (data.nickname.trim().length > 30) errors.nickname = "공용 닉네임은 30자 이내로 입력해주세요.";
+    return errors;
+}
+
+export function getSignupErrors(data: SignupFormData, passwordConfirm: string) {
+    const errors: Partial<Record<keyof SignupFormData | "passwordConfirm", string>> = { ...getProfileErrors(data) };
 
     const date = new Date(`${data.birthDate}T00:00:00`);
     const today = new Date();
@@ -23,13 +35,7 @@ export function getSignupErrors(data: SignupFormData, passwordConfirm: string) {
         errors.birthDate = "올바른 생년월일을 입력해주세요.";
     }
 
-    if (!/^\+?[\d\s()-]+$/.test(data.phoneNumber.trim()) ||
-        !/^\d{8,15}$/.test(data.phoneNumber.replace(/\D/g, ""))) {
-        errors.phoneNumber = "올바른 전화번호를 입력해주세요.";
-    }
     errors.email = getEmailError(data.email);
-    if (!data.nickname.trim()) errors.nickname = "공용 닉네임을 입력해주세요.";
-    else if (data.nickname.trim().length > 30) errors.nickname = "공용 닉네임은 30자 이내로 입력해주세요.";
     if (!data.password.trim() || data.password.length < 8) errors.password = "비밀번호는 8자 이상 입력해주세요.";
     if (!passwordConfirm) errors.passwordConfirm = "비밀번호 확인을 입력해주세요.";
     else if (passwordConfirm !== data.password) errors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
