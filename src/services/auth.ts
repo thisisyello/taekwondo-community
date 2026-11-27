@@ -1,6 +1,32 @@
 import { getSupabase } from "../lib/supabase";
 import type { User as AuthUser } from "@supabase/supabase-js";
-import type { CurrentUser, SignupFormData, SignupResult } from "../types/user";
+import type { CurrentUser, ProfileFormData, SignupFormData, SignupResult } from "../types/user";
+import { getProfileErrors } from "../utils/authValidation";
+
+export async function updateMemberProfile(expectedUserId: string, form: ProfileFormData) {
+    const errors = getProfileErrors(form);
+    const firstError = Object.values(errors).find(Boolean);
+    if (firstError) throw new Error(firstError);
+    const { data, error } = await getSupabase().rpc("update_member_profile", {
+        p_expected_user_id: expectedUserId,
+        p_nickname: form.nickname.trim(),
+        p_name: form.name.trim(),
+        p_phone_number: form.phoneNumber.trim(),
+    }).single<{ id: string; nickname: string; name: string; phone_number: string; updated_at: string }>();
+    if (error) {
+        if (error.code === "23505") throw new Error("이미 사용 중인 공용 닉네임입니다. 다른 닉네임을 입력해주세요.");
+        if (["42501", "PGRST301", "PGRST302"].includes(error.code)) throw new Error("로그인이 만료되었거나 계정이 변경되었습니다. 다시 로그인해주세요.");
+        if (error.code === "22023" || error.code === "23514") throw new Error("입력한 회원정보를 확인해주세요.");
+        if (error.code === "P0002") throw new Error("회원 정보를 찾지 못했습니다. 다시 로그인해주세요.");
+        if (error.code === "PGRST202" || error.code === "42883") throw new Error("회원정보 수정 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.");
+        throw new Error("회원정보를 저장하지 못했습니다. 연결 상태를 확인하고 다시 시도해주세요.");
+    }
+    if (!data || data.id !== expectedUserId || typeof data.nickname !== "string" || typeof data.name !== "string" ||
+        typeof data.phone_number !== "string" || typeof data.updated_at !== "string") {
+        throw new Error("저장 결과를 확인하지 못했습니다. 내정보에서 확인해주세요.");
+    }
+    return { id: data.id, nickname: data.nickname, name: data.name, phoneNumber: data.phone_number, updatedAt: data.updated_at };
+}
 
 export function getAuthErrorMessage(error: unknown): string {
     const code = typeof error === "object" && error !== null && "code" in error

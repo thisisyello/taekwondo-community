@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { loadCurrentUser, signIn, signOut, signUp } from "../services/auth";
-import type { CurrentUser } from "../types/user";
+import { loadCurrentUser, signIn, signOut, signUp, updateMemberProfile } from "../services/auth";
+import type { CurrentUser, ProfileFormData } from "../types/user";
 
 const recoveryStorageKey = "taekwondo.passwordRecoveryUserId";
 
@@ -78,5 +78,11 @@ export function useAuth() {
         setAttempt((value) => value + 1);
     };
 
-    return { currentUser, isLoading, error, recoveryUserId, retry, signIn, signUp, signOut };
+    const updateProfile = async (form: ProfileFormData) => {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+        const saved = await updateMemberProfile(currentUser.id, form);
+        setCurrentUser((previous) => previous?.id === saved.id ? { ...previous, ...saved } : previous);
+    };
+
+    return { currentUser, isLoading, error, recoveryUserId, retry, signIn, signUp, signOut, updateProfile };
 }
